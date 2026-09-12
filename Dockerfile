@@ -1,16 +1,11 @@
 # GridPulse AI — Backend Dockerfile
-FROM python:3.11-slim-bullseye
+# Uses python:3.11-slim (bookworm) with NO apt-get installs.
+# asyncpg is a pure-Python Postgres driver — libpq-dev is not needed.
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# System dependencies — use bullseye mirrors, retry on failure
-RUN apt-get update --fix-missing && \
-    apt-get install -y --no-install-recommends \
-        gcc \
-        libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Python dependencies
+# Install Python dependencies only — no system packages required
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -20,7 +15,7 @@ COPY seeds/ ./seeds/
 COPY alembic/ ./alembic/
 COPY alembic.ini .
 
-# Create __init__.py files for package resolution
+# Ensure all package __init__.py files exist
 RUN touch src/__init__.py src/app/__init__.py src/app/core/__init__.py \
     src/app/models/__init__.py src/app/schemas/__init__.py \
     src/app/services/__init__.py src/app/routes/__init__.py \
