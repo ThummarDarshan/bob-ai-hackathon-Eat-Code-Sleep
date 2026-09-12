@@ -513,7 +513,7 @@ def calculate_asset_health(
         dominant_risk=dom_risk,
         explanation=full_explanation,
         recommended_action=recommended,
-        valid=True,
+valid=not errors and dga_result.valid,
         validation_errors=errors + dga_result.validation_errors,
     )
 
