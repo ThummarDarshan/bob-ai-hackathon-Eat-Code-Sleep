@@ -13,14 +13,14 @@ team:
   track: "AI"                          # REQUIRED — one of: AI | DevOps | Sustainability | Open
   lead:
     name: "Darshan Thummar"            # REQUIRED — e.g., "Alice Chen"
-    email: "darshanthummar@example.com" # REQUIRED — e.g., "alice.chen@ibm.com"
+    email: "darshantce.059@gmail.com"  # REQUIRED — e.g., "alice.chen@ibm.com"
   members:
     - name: "Shreeja Upadhyay"         # REQUIRED — Team member 1
-      email: "shreejaupadhyay@example.com"
+      email: "shreejaupadhyaycspitce@gmail.com"
     - name: "Kishan Vadsola"           # REQUIRED — Team member 2
-      email: "kishanvadsola@example.com"
+      email: "vadsolakishan1310@gmail.com"
     - name: "Vishv Undavia"            # REQUIRED — Team member 3
-      email: "vishvundavia@example.com"
+      email: "vishvsoni2904@gmail.com"
 
 submission:
   title: "GridPulse AI - Power Outage & Grid Equipment Failure Advisor" # REQUIRED — Project display name

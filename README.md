@@ -10,7 +10,7 @@
 |---|---|
 | **Team Name** | Eat-Code-Sleep |
 | **Track** | AI |
-| **Team Lead** | Darshan Thummar — darshanthummar@example.com |
+| **Team Lead** | Darshan Thummar — darshantce.059@gmail.com |
 | **Members** | Shreeja Upadhyay, Kishan Vadsola, Vishv Undavia |
 
 ---
