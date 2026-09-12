@@ -110,7 +110,7 @@ Once validation passes:
 - [ ] `demo/demo-video-link.txt` — real video URL (3–5 min showing the app working)
 - [ ] `demo/screenshots/` — at least 3 screenshots of the running application
 - [ ] `presentation/slides.pdf` — slide deck present
-- [ ] GitHub Actions **✅ Validate Submission** is green
+- [x] GitHub Actions **✅ Validate Submission** is green
 - [x] Repository is **Public**
 - [ ] Entry form submitted before the deadline
 
