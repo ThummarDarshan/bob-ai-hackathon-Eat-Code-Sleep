@@ -1,6 +1,6 @@
-# 🚀 [Your Project Title Here]
+# ⚡ GridPulse AI — Power Outage & Grid Equipment Failure Advisor
 
-> ⚠️ **Replace everything in `[ ]` brackets with your actual content before submission.**
+> Proactive AI-driven resilience copilot for power utilities: fusing substation asset health telemetry with real-time weather analytics to predict catastrophic grid outages and optimize field crew dispatch.
 
 ---
 
@@ -8,36 +8,32 @@
 
 | Field | Value |
 |---|---|
-| **Team Name** | [Your Team Name] |
-| **Track** | [AI / DevOps / Sustainability / Open] |
-| **Team Lead** | [Name] — [email@ibm.com] |
-| **Members** | [Name 1], [Name 2], [Name 3] |
+| **Team Name** | Eat-Code-Sleep |
+| **Track** | AI |
+| **Team Lead** | Darshan Thummar — darshanthummar@example.com |
+| **Members** | Shreeja Upadhyay, Kishan Vadsola, Vishv Undavia |
 
 ---
 
 ## 🎯 Problem Statement
 
-> In 2–3 sentences: What problem does your project solve? Who experiences this problem?
-
-[Describe the real-world problem your project addresses. Be specific about who the user is and what pain point they face.]
+Power transformer and substation failures cause widespread blackouts costing electrical utilities over $1M per hour and leaving critical facilities without energy. Utilities currently rely on calendar-based inspections while high-frequency sensor readings (vibration, heat, partial discharge, dissolved oil gases) remain unlinked from live weather forecasts, leading to unpredicted equipment breakdown during high-load and storm events.
 
 ---
 
 ## 💡 Solution
 
-> In 2–3 sentences: What did you build? How does it solve the problem above?
-
-[Describe your solution clearly. Explain the core mechanism — what makes it work.]
+GridPulse AI is a predictive maintenance and emergency decision support system designed with IBM Bob and watsonx.ai. It continuously monitors sensor streams across substations, evaluates transformer health indices according to IEEE standards, models environmental weather vulnerability, and automatically recommends prioritized repair orders and optimal crew pre-positioning strategies.
 
 ---
 
 ## ✨ Key Features
 
-- **Feature 1:** [Brief description — e.g., "Real-time anomaly detection using watsonx.ai"]
-- **Feature 2:** [Brief description]
-- **Feature 3:** [Brief description]
-- **Feature 4:** [Optional]
-- **Feature 5:** [Optional]
+- **Transformer Telemetry Health Indexing**: Ingests dissolved gas analysis (DGA), oil temperature, vibration, and partial discharge metrics to calculate real-time asset degradation.
+- **Dynamic Weather & Storm Impact Correlation**: Fuses real-time wind speed, temperature peaks, lightning strikes, and flood alerts to forecast localized equipment failure risks.
+- **Grid Impact & Severity Scoring**: Dynamically calculates potential customer load loss, critical facility exposure (hospitals, water treatment), and risk of cascading failure.
+- **Intelligent Crew Pre-Positioning**: Recommends strategic dispatch of field repair units to high-risk hubs prior to storm touchdown to minimize Mean Time to Recovery (MTTR).
+- **IBM Bob & watsonx Advisory Copilot**: Natural language diagnostic assistant that generates automated root cause analysis and step-by-step Standard Operating Procedures (SOPs).
 
 ---
 
@@ -45,27 +41,33 @@
 
 | Category | Technologies |
 |---|---|
-| **Languages** | [e.g., Python, TypeScript] |
-| **Frameworks** | [e.g., FastAPI, React] |
-| **IBM Technologies** | [e.g., watsonx.ai, IBM Bob, IBM Cloud] |
-| **Databases** | [e.g., PostgreSQL, Redis] |
-| **Other** | [e.g., Docker, GitHub Actions] |
+| **Languages** | Python 3.10+, JavaScript (ES6+), HTML5, CSS3 |
+| **Frameworks** | FastAPI, Uvicorn, Pydantic |
+| **IBM Technologies** | IBM Bob, watsonx.ai, IBM Granite Models |
+| **Data & Storage** | SQLite / In-Memory TimeSeries State Cache |
+| **Design & Visualization**| Modern Glassmorphic CSS, Mermaid.js, Chart.js / SVG Visualizers |
 
 ---
 
 ## 📁 Repository Structure
 
 ```
-├── src/                  # All source code
-├── docs/                 # Written documentation
+├── src/                  # Complete backend API & interactive operational dashboard
+│   ├── app/              # FastAPI application core, routes, and risk engines
+│   ├── static/           # Responsive operator UI and monitoring views
+│   ├── data/             # Asset registry, sensor telemetry, and weather mock streams
+│   ├── .env.example      # Environment variable template
+│   └── README.md         # Source directory documentation
+├── docs/                 # Detailed architectural and operational documentation
 │   ├── problem-statement.md
 │   ├── solution-overview.md
 │   ├── architecture.md
 │   └── setup-guide.md
-├── demo/                 # Demo artifacts
-│   ├── screenshots/      # App screenshots
-│   └── demo-video-link.txt  # Link to demo video
-├── presentation/         # Slide deck
+├── demo/                 # Demonstration artifacts
+│   ├── screenshots/      # Application screenshots
+│   ├── demo-video-link.txt  # Link to walkthrough video
+│   └── live-demo-url.txt    # Live deployment status
+├── presentation/         # Project slide deck
 └── submission.yaml       # Structured submission metadata
 ```
 
@@ -73,23 +75,29 @@
 
 ## ⚡ How to Run
 
-> **Copy these exact steps from your [`docs/setup-guide.md`](docs/setup-guide.md)**
-
 ```bash
 # 1. Clone the repo
-git clone https://github.com/[your-repo].git
-cd [your-repo]
+git clone https://github.com/ThummarDarshan/bob-ai-hackathon-Eat-Code-Sleep.git
+cd bob-ai-hackathon-Eat-Code-Sleep
 
-# 2. Install dependencies
-[your install command here]
+# 2. Set up Python environment
+python -m venv .venv
+# On Windows:
+.venv\Scripts\activate
+# On Linux/macOS:
+# source .venv/bin/activate
 
-# 3. Configure environment
-cp .env.example .env
-# Edit .env with your values
+# 3. Install dependencies
+pip install -r src/requirements.txt
 
-# 4. Run the project
-[your run command here]
+# 4. Configure environment variables
+cp src/.env.example src/.env
+
+# 5. Start the GridPulse AI Server
+python -m uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
+
+Open your browser at `http://localhost:8000` to interact with the GridPulse AI Control Center.
 
 ---
 
@@ -100,22 +108,20 @@ cp .env.example .env
 | 📹 Demo Video | [See demo/demo-video-link.txt](demo/demo-video-link.txt) |
 | 🌐 Live Demo | [See demo/live-demo-url.txt](demo/live-demo-url.txt) |
 | 🖼️ Screenshots | [See demo/screenshots/](demo/screenshots/) |
-| 📊 Presentation | [See presentation/slides.pdf](presentation/) |
+| 📊 Presentation | [See presentation/](presentation/) |
 
 ---
 
 ## ⚠️ Known Limitations
 
-> Be honest — judges appreciate transparency over overclaiming.
-
-- [Limitation 1: e.g., "Authentication is mocked — not production-ready"]
-- [Limitation 2: e.g., "Only tested on Chrome"]
-- [Limitation 3: e.g., "Feature X is scaffolded but not fully implemented"]
+- **Simulated Grid Telemetry**: Asset sensor metrics and weather feeds simulate real-time SCADA and meteorological APIs for repeatable demonstration environments.
+- **Advisory Control**: The system outputs dispatch orders and breaker isolation advisories for human grid operators rather than directly actuating physical substation relays.
+- **Offline LLM Fallback**: If an active watsonx.ai API key is not supplied in `.env`, the system automatically defaults to an intelligent local heuristic reasoning engine.
 
 ---
 
 ## 🏅 What We're Most Proud Of
 
-[Tell the judges what part of your submission is strongest and worth paying close attention to.]
+The integration of the multi-factor risk fusion algorithm that links chemical dissolved gas ratios (IEEE C57.104 DGA standard) directly with approaching weather storm fronts, enabling grid operators to pre-stage emergency response crews hours ahead of line collapse.
 
 ---
