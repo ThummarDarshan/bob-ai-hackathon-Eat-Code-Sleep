@@ -1,0 +1,61 @@
+import React from 'react';
+import type { WorkOrder } from '../types';
+import { updateWorkOrder } from '../services/api';
+
+interface WorkOrderRowProps {
+  workOrder: WorkOrder;
+  onUpdated: (wo: WorkOrder) => void;
+}
+
+const STATUS_OPTIONS = ['pending', 'assigned', 'in_progress', 'completed', 'cancelled'];
+
+const STATUS_COLORS: Record<string, string> = {
+  pending:     'var(--text-muted)',
+  assigned:    'var(--blue-electric)',
+  in_progress: 'var(--amber)',
+  completed:   'var(--green)',
+  cancelled:   'var(--risk-critical)',
+};
+
+export default function WorkOrderRow({ workOrder: wo, onUpdated }: WorkOrderRowProps) {
+  const [updating, setUpdating] = React.useState(false);
+
+  const handleStatusChange = async (newStatus: string) => {
+    setUpdating(true);
+    try {
+      const updated = await updateWorkOrder(wo.id, { status: newStatus });
+      onUpdated(updated);
+    } catch {
+      alert('Failed to update work order status.');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  return (
+    <tr>
+      <td><span style={{ fontFamily: 'monospace', fontSize: '12px', color: 'var(--blue-glow)' }}>#{wo.id}</span></td>
+      <td>{wo.asset_id}</td>
+      <td>
+        <span className={`risk-badge ${wo.priority.toUpperCase()}`}>{wo.priority}</span>
+      </td>
+      <td style={{ maxWidth: '280px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {wo.description}
+      </td>
+      <td>{wo.assigned_crew ?? '—'}</td>
+      <td>
+        <select
+          className="input"
+          value={wo.status}
+          disabled={updating}
+          onChange={e => handleStatusChange(e.target.value)}
+          style={{ padding: '4px 8px', fontSize: '12px', color: STATUS_COLORS[wo.status] }}
+        >
+          {STATUS_OPTIONS.map(s => (
+            <option key={s} value={s}>{s.replace('_', ' ')}</option>
+          ))}
+        </select>
+      </td>
+    </tr>
+  );
+}

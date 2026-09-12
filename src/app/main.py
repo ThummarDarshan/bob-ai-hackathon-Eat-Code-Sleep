@@ -1,15 +1,74 @@
-from fastapi import FastAPI, HTTPException
+"""
+GridPulse AI — FastAPI Application Entry Point
+Power Grid Equipment Risk Advisor powered by IBM watsonx + Granite
+"""
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Dict, List, Optional
-from src.app.engine import EquipmentRiskEngine
+from fastapi.responses import JSONResponse
+import logging
+
+from src.app.core.config import settings
+from src.app.database.postgres import init_db, close_db
+from src.app.database.neo4j import init_neo4j, close_neo4j
+
+# Routers
+from src.app.routes.assets import router as assets_router
+from src.app.routes.risk import router as risk_router
+from src.app.routes.grid import router as grid_router
+from src.app.routes.weather import router as weather_router
+from src.app.routes.advisory import router as advisory_router
+from src.app.routes.recommendations import router as recommendations_router
+from src.app.routes.dashboard import router as dashboard_router
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan handler — startup and shutdown."""
+    logger.info("GridPulse AI starting up...")
+
+    # Initialize PostgreSQL
+    try:
+        await init_db()
+        logger.info("PostgreSQL connected and tables ready.")
+    except Exception as e:
+        logger.warning(f"PostgreSQL initialization warning: {e}")
+
+    # Initialize Neo4j
+    try:
+        await init_neo4j()
+        logger.info("Neo4j connected.")
+    except Exception as e:
+        logger.warning(f"Neo4j initialization warning: {e}")
+
+    yield
+
+    # Shutdown
+    logger.info("GridPulse AI shutting down...")
+    try:
+        await close_db()
+    except Exception:
+        pass
+    try:
+        await close_neo4j()
+    except Exception:
+        pass
+
 
 app = FastAPI(
-    title="GridPulse AI - Power Outage & Grid Equipment Failure Advisor",
-    description="Intelligent outage forecasting and substation maintenance pre-positioning engine powered by IBM Bob & watsonx",
-    version="1.0.0"
+    title="GridPulse AI",
+    description="Power Grid Equipment Risk Advisor powered by IBM watsonx + Granite",
+    version=settings.app_version,
+    lifespan=lifespan,
+    docs_url="/docs",
+    redoc_url="/redoc",
 )
 
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -18,159 +77,72 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Simulated in-memory database of Substation Assets
-SUBSTATIONS = [
-    {
-        "id": "SUB-NORTH-01",
-        "name": "North Cascade 400kV Primary Substation",
-        "location": "North Sector, Zone 4",
-        "capacity_mva": 250,
-        "critical_customers": 42000,
-        "equipment": {
-            "type": "Power Transformer T-101",
-            "mfg_year": 2011,
-            "sensor_telemetry": {
-                "oil_temperature_c": 92.4,
-                "vibration_mms": 4.8,
-                "partial_discharge_pc": 540.0,
-                "acetylene_ppm": 4.2,
-                "ethylene_ppm": 68.0
-            }
-        },
-        "weather": {
-            "wind_speed_kmh": 68.5,
-            "ambient_temp_c": 38.2,
-            "lightning_strikes_10km": 14,
-            "precip_mmh": 22.0
+
+# Global exception handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled exception on {request.url}: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Internal server error",
+            "status_code": 500,
+            "error_type": "INTERNAL_SERVER_ERROR"
         }
-    },
-    {
-        "id": "SUB-EAST-04",
-        "name": "Metro Harbor 220kV Distribution Hub",
-        "location": "Industrial Coastal Hub",
-        "capacity_mva": 180,
-        "critical_customers": 28500,
-        "equipment": {
-            "type": "Autotransformer AT-2",
-            "mfg_year": 2017,
-            "sensor_telemetry": {
-                "oil_temperature_c": 78.1,
-                "vibration_mms": 2.6,
-                "partial_discharge_pc": 290.0,
-                "acetylene_ppm": 0.8,
-                "ethylene_ppm": 24.0
-            }
-        },
-        "weather": {
-            "wind_speed_kmh": 52.0,
-            "ambient_temp_c": 31.0,
-            "lightning_strikes_10km": 5,
-            "precip_mmh": 12.0
-        }
-    },
-    {
-        "id": "SUB-WEST-09",
-        "name": "Valley Solar Intertie Substation",
-        "location": "West Valley Energy Corridor",
-        "capacity_mva": 120,
-        "critical_customers": 9200,
-        "equipment": {
-            "type": "Step-up Transformer GSU-1",
-            "mfg_year": 2020,
-            "sensor_telemetry": {
-                "oil_temperature_c": 64.2,
-                "vibration_mms": 1.2,
-                "partial_discharge_pc": 95.0,
-                "acetylene_ppm": 0.1,
-                "ethylene_ppm": 8.0
-            }
-        },
-        "weather": {
-            "wind_speed_kmh": 24.0,
-            "ambient_temp_c": 29.5,
-            "lightning_strikes_10km": 0,
-            "precip_mmh": 0.0
-        }
-    }
-]
+    )
+
+
+# Include all routers under /api/v1
+API_PREFIX = "/api/v1"
+
+app.include_router(assets_router, prefix=API_PREFIX)
+app.include_router(risk_router, prefix=API_PREFIX)
+app.include_router(grid_router, prefix=API_PREFIX)
+app.include_router(weather_router, prefix=API_PREFIX)
+app.include_router(advisory_router, prefix=API_PREFIX)
+app.include_router(recommendations_router, prefix=API_PREFIX)
+app.include_router(dashboard_router, prefix=API_PREFIX)
+
 
 @app.get("/")
-def read_root():
+async def root():
     return {
-        "service": "GridPulse AI - Power Outage & Equipment Failure Advisor",
+        "service": "GridPulse AI — Power Grid Equipment Risk Advisor",
+        "version": settings.app_version,
         "status": "online",
-        "version": "1.0.0",
-        "docs_url": "/docs"
+        "docs_url": "/docs",
+        "api_prefix": API_PREFIX,
     }
 
-@app.get("/api/v1/substations")
-def get_all_substations():
-    """Returns all substations with computed real-time risk scores."""
-    results = []
-    for sub in SUBSTATIONS:
-        sensor = sub["equipment"]["sensor_telemetry"]
-        weather = sub["weather"]
-        
-        hi = EquipmentRiskEngine.calculate_health_index(sensor)
-        stress = EquipmentRiskEngine.calculate_weather_stress(weather)
-        risk = EquipmentRiskEngine.evaluate_outage_risk(
-            health_index=hi,
-            weather_stress=stress,
-            critical_customers_count=sub["critical_customers"],
-            capacity_mva=sub["capacity_mva"]
-        )
-        
-        results.append({
-            "substation_id": sub["id"],
-            "name": sub["name"],
-            "location": sub["location"],
-            "capacity_mva": sub["capacity_mva"],
-            "critical_customers": sub["critical_customers"],
-            "equipment": sub["equipment"],
-            "weather": weather,
-            "assessment": risk
-        })
-    return {"substations": results}
 
-@app.get("/api/v1/prepositioning-plan")
-def get_crew_prepositioning_plan():
-    """Calculates prioritized emergency maintenance dispatch based on risk rankings."""
-    subs_evaluated = []
-    for sub in SUBSTATIONS:
-        hi = EquipmentRiskEngine.calculate_health_index(sub["equipment"]["sensor_telemetry"])
-        stress = EquipmentRiskEngine.calculate_weather_stress(sub["weather"])
-        risk = EquipmentRiskEngine.evaluate_outage_risk(
-            health_index=hi,
-            weather_stress=stress,
-            critical_customers_count=sub["critical_customers"],
-            capacity_mva=sub["capacity_mva"]
-        )
-        subs_evaluated.append({
-            "substation_id": sub["id"],
-            "name": sub["name"],
-            "risk": risk
-        })
+@app.get(f"{API_PREFIX}/health")
+async def health_check():
+    """Service health check with dependency status."""
+    from src.app.database.postgres import get_postgres_status
+    from src.app.database.neo4j import get_neo4j_status
+    from src.app.core.watsonx_integration import WatsonxClient
+    from src.app.core.config import settings as cfg
 
-    # Sort descending by Risk Priority Index
-    subs_evaluated.sort(key=lambda x: x["risk"]["risk_priority_index"], reverse=True)
+    pg_status = await get_postgres_status()
+    neo4j_status = await get_neo4j_status()
 
-    plan = []
-    for idx, item in enumerate(subs_evaluated):
-        priority = f"Priority {idx + 1}"
-        action = item["risk"]["recommended_action"]
-        plan.append({
-            "rank": idx + 1,
-            "priority": priority,
-            "substation_id": item["substation_id"],
-            "substation_name": item["name"],
-            "risk_level": item["risk"]["risk_level"],
-            "failure_probability_pct": item["risk"]["failure_probability_pct"],
-            "assigned_crew_hub": f"Mobile Rapid Response Unit #{idx+101}",
-            "recommended_action": action
-        })
+    wx_client = WatsonxClient(
+        api_key=cfg.watsonx_api_key,
+        project_id=cfg.watsonx_project_id,
+        url=cfg.watsonx_url,
+        model_id=cfg.watsonx_model_id
+    )
+    watsonx_status = "available" if wx_client.is_available() else "unavailable (using local fallback)"
+
+    overall = "healthy" if pg_status == "connected" else "degraded"
 
     return {
-        "generated_timestamp": "2026-09-12T21:15:00Z",
-        "total_assets_monitored": len(SUBSTATIONS),
-        "prepositioning_plan": plan
+        "status": overall,
+        "version": settings.app_version,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "dependencies": {
+            "postgres": pg_status,
+            "neo4j": neo4j_status,
+            "watsonx": watsonx_status,
+        }
     }

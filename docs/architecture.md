@@ -1,59 +1,117 @@
-# System Architecture: GridPulse AI
+# GridPulse AI — Architecture
 
-## System Architecture
+## System Overview
 
-GridPulse AI connects physical utility infrastructure telemetry, meteorological feeds, predictive analytical algorithms, and enterprise AI models into a unified control room dashboard.
+GridPulse AI is a full-stack power grid risk monitoring and advisory platform built for the IBM watsonx hackathon. It combines real-time sensor telemetry, dissolved gas analysis, weather data, and graph-topology-based cascade analysis to deliver AI-powered risk assessments.
 
-```mermaid
-graph TD
-    subgraph Ingestion Layer
-        A1[Transformer Sensors: Temp, Vibration, DGA] -->|IoT MQTT / HTTP| B[FastAPI Ingestion Engine]
-        A2[Meteorological API: Wind, Heat, Lightning] -->|Polling Stream| B
-    end
+---
 
-    subgraph Analytical Core
-        B --> C1[Health Index Engine]
-        B --> C2[Weather Stress Fusion Engine]
-        C1 & C2 --> C3[Risk Priority Index & Outage Forecaster]
-        C3 --> C4[Dynamic Crew Pre-positioning Optimizer]
-    end
+## Architecture Diagram
 
-    subgraph AI Advisory Layer
-        C3 -->|Telemetry Context & Anomaly Signatures| D[watsonx.ai Granite 3.0 / IBM Bob]
-        D -->|Natural Language BLUF Briefs & Runbooks| E[Operator Advisory Feed]
-    end
-
-    subgraph Presentation & Dispatch Layer
-        C3 & C4 & E --> F[Responsive GridPulse Operator Dashboard]
-        F --> G[Field Maintenance Crew Mobile Units]
-    end
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     FRONTEND (React + Vite)                 │
+│  Dashboard │ Assets │ Risk │ Grid │ Weather │ Crew │ AI      │
+│  Chart.js Visualizations + SVG Grid Topology Map            │
+└──────────────────────┬──────────────────────────────────────┘
+                       │ HTTP / REST
+┌──────────────────────▼──────────────────────────────────────┐
+│                  FASTAPI BACKEND (Python 3.11)              │
+│                                                             │
+│  /api/v1/health   /api/v1/assets     /api/v1/risk           │
+│  /api/v1/grid     /api/v1/weather    /api/v1/advisory       │
+│  /api/v1/recommendations             /api/v1/dashboard      │
+│                                                             │
+│  ┌─────────────────┐   ┌─────────────────────────────────┐  │
+│  │   RISK ENGINE   │   │    CASCADE ANALYZER (Neo4j)     │  │
+│  │  failure_prob   │   │  BFS graph traversal            │  │
+│  │  weather_risk   │   │  cascade_risk formula           │  │
+│  │  grid_impact    │   │  affected_facilities            │  │
+│  │  cascade_risk   │   └─────────────────────────────────┘  │
+│  │  critical_mult  │                                        │
+│  └─────────────────┘   ┌─────────────────────────────────┐  │
+│                        │    ADVISORY ENGINE              │  │
+│  ┌─────────────────┐   │  IBM Granite → watsonx.ai       │  │
+│  │ DGA ADAPTER     │   │  Local Fallback (rule-based)    │  │
+│  │ Rogers Ratios   │   └─────────────────────────────────┘  │
+│  │ IEEE C57.104    │                                        │
+│  └─────────────────┘                                        │
+└───────────┬────────────────────────┬────────────────────────┘
+            │                        │
+┌───────────▼──────────┐  ┌──────────▼──────────────────────┐
+│   POSTGRESQL (15)    │  │         NEO4J (5)               │
+│                      │  │                                 │
+│  assets              │  │  (:Substation)-[:CONTAINS]->   │
+│  sensor_readings     │  │  (:Transformer)-[:FEEDS]->     │
+│  dga_readings        │  │  (:Feeder)-[:SUPPLIES]->       │
+│  weather_readings    │  │  (:CriticalFacility)           │
+│  incidents           │  │                                 │
+│  risk_scores         │  │  Graph queries for cascade     │
+│  work_orders         │  │  impact analysis               │
+│  ai_advisories       │  │                                 │
+└──────────────────────┘  └─────────────────────────────────┘
 ```
 
-## Components
+---
 
-| Component | Technology | Responsibility |
-|---|---|---|
-| **API & Risk Core** | FastAPI / Python 3.10+ | Real-time telemetry processing, health index computation, and outage scoring. |
-| **Risk Engines** | Custom Mathematical Engine (`src/app/engine.py`) | IEEE C57 compliant DGA gas analysis, vibration metrics, and weather risk compounding. |
-| **Dispatcher Dashboard** | HTML5, Modern Glassmorphism CSS, Vanilla JS | Visualization of substation telemetry, outage risk rankings, and emergency crew plans. |
-| **AI Copilot** | watsonx.ai Granite Models / IBM Bob | Automated root-cause analysis and natural-language incident mitigation runbooks. |
-| **Data & State Layer**| In-memory telemetry cache & JSON state | High-performance state storage for asset monitoring and scenario simulation. |
+## Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 18 + TypeScript, Vite, Chart.js, React Router |
+| Backend | Python 3.11, FastAPI, Uvicorn, Pydantic v2 |
+| Relational DB | PostgreSQL 15 (SQLAlchemy async + Alembic) |
+| Graph DB | Neo4j 5 (async neo4j driver, Cypher queries) |
+| AI / LLM | IBM watsonx.ai + IBM Granite 13B Instruct |
+| Fallback AI | Rule-based local advisory engine |
+| Containers | Docker + Docker Compose |
+| Testing | Pytest + pytest-asyncio |
+
+---
+
+## Risk Engine Formula
+
+```
+base_risk = 0.30 × failure_probability   (from sensor + DGA)
+          + 0.20 × asset_health_risk     (derived from failure_prob)
+          + 0.15 × weather_risk          (wind, temp, lightning, flood)
+          + 0.20 × grid_impact           (Neo4j downstream traversal)
+          + 0.15 × cascade_risk          (critical facility weighting)
+
+final_risk_score = clamp(base_risk × critical_multiplier, 0, 1)
+```
+
+**Critical Multipliers:**
+- Normal asset: ×1.0
+- Important facility: ×1.2
+- Critical facility (hospital/water/airport): ×1.5
+
+---
 
 ## Data Flow
 
-1. **Telemetry Streaming**: Substation sensor streams (oil temperature, vibration, partial discharge, dissolved acetylene/ethylene) and weather feeds (wind speed, ambient heat, lightning hits) hit the `/api/v1/substations` endpoint.
-2. **Health Indexing**: Internal transformer health is calculated from 0 to 100 based on standard IEEE insulation thresholds.
-3. **Compound Stress Assessment**: The weather stress multiplier (0.0 to 1.0) is factored against the asset vulnerability, generating an Outage Failure Probability (`%`).
-4. **Criticality Weighting**: The system evaluates downstream grid impact based on transformer MVA capacity and connected critical consumer counts (hospitals, dense residential zones).
-5. **Pre-Positioning Generation**: The emergency optimizer generates ranked maintenance actions and assigns mobile repair units to prevent outages before storm touchdown.
+1. **Sensor Telemetry** → PostgreSQL `sensor_readings`
+2. **DGA Analysis** → IEEE C57.104 Rogers Ratio classification → failure probability
+3. **Weather Data** → wind + temp + lightning + flood → weather risk score
+4. **Neo4j Graph** → BFS traversal → cascade risk + grid impact
+5. **Risk Engine** → weighted formula → `risk_scores` table
+6. **Advisory Engine** → IBM Granite or local fallback → structured response
+7. **Frontend** → fetches all data from FastAPI → renders glassmorphic dashboard
 
-## Security Considerations
+---
 
-- **Credential Isolation**: All IBM Cloud and watsonx API credentials are stored in `.env` and loaded via `python-dotenv`, strictly excluded from version control via `.gitignore`.
-- **Read-Only Advisory Sandbox**: Control commands generated by the system operate in an advisory capacity, preventing accidental automated switching actions on live grid hardware.
-- **Data Sanitization**: Incoming telemetry payloads are strictly validated using Pydantic data schemas to prevent malformed or injection payloads.
+## Key API Endpoints
 
-## Scalability Notes
-
-- **Stateless Microservice**: The FastAPI application is stateless and containerizable with Docker, capable of horizontal scaling behind an NGINX or Kubernetes ingress controller.
-- **Asynchronous Worker Pools**: For enterprise deployments across thousands of substations, sensor streams can be decoupled using Apache Kafka or RabbitMQ pipelines.
+| Method | Path | Description |
+|---|---|---|
+| GET | `/api/v1/health` | Service health + dependency status |
+| GET | `/api/v1/dashboard` | Aggregated dashboard data |
+| GET | `/api/v1/assets` | All assets with risk scores |
+| GET | `/api/v1/assets/{id}` | Full asset detail |
+| GET | `/api/v1/risk` | All risk scores ranked |
+| GET | `/api/v1/grid/topology` | Full grid graph |
+| GET | `/api/v1/grid/assets/{id}/impact` | Cascade failure analysis |
+| GET | `/api/v1/weather` | Weather risk per asset |
+| POST | `/api/v1/advisory` | Asset-specific AI advisory |
+| POST | `/api/v1/advisory/chat` | Free-form AI chat |
+| GET | `/api/v1/recommendations` | Auto-generated work orders |
