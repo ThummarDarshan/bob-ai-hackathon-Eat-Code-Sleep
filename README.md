@@ -136,3 +136,18 @@ Open your browser at `http://localhost:8000` to interact with the GridPulse AI C
 The integration of the multi-factor risk fusion algorithm that links chemical dissolved gas ratios (IEEE C57.104 DGA standard) directly with approaching weather storm fronts, enabling grid operators to pre-stage emergency response crews hours ahead of line collapse.
 
 ---
+
+## ✅ Checklist Before You Submit
+
+- [ ] `submission.yaml` — all required fields filled
+- [x] `README.md` — no `[placeholder]` text remaining
+- [ ] `docs/setup-guide.md` — someone else can run your project using these instructions
+- [x] `src/` — all source code committed (no `node_modules`, no `.env`)
+- [ ] `demo/demo-video-link.txt` — real video URL (3–5 min showing the app working)
+- [ ] `demo/screenshots/` — at least 3 screenshots of the running application
+- [ ] `presentation/slides.pdf` — slide deck present
+- [ ] GitHub Actions **Validate Submission** is green
+- [x] Repository is **Public**
+- [ ] Entry form submitted before the deadline
+
+---
