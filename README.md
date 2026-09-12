@@ -98,40 +98,40 @@ cd bob-ai-hackathon-Eat-Code-Sleep
 # 2. Create your environment file
 cp .env.example .env
 # Optional: open .env and add your IBM watsonx.ai credentials
-# Leave WATSONX_API_KEY blank to use the built-in local AI fallback
+# Leave WATSONX_API_KEY blank to use the built-in local heuristic AI fallback
 
-# 3. Build and start all 4 services (PostgreSQL + Neo4j + Backend + Frontend)
+# 3. Build and start all 4 containers (PostgreSQL + Neo4j + FastAPI Backend + React Frontend)
 docker compose up --build
 ```
 
-Wait ~2–3 minutes for all services to initialise. When you see:
+The startup command automatically creates database schemas and seeds PostgreSQL and Neo4j with asset telemetry, DGA readings, weather risks, and grid topology.
+
+When you see:
 ```
 gridpulse_backend  | INFO:     Application startup complete.
 ```
 
-```bash
-# 4. Seed the Neo4j grid topology (run once, in a new terminal)
-# On Windows PowerShell:
-Invoke-WebRequest -Uri "http://localhost:8000/api/v1/grid/seed" -Method POST
+The application is ready!
 
-# On macOS / Linux:
-curl -X POST http://localhost:8000/api/v1/grid/seed
+```bash
+# Optional: re-run database and Neo4j seeding at any time inside the container:
+docker exec gridpulse_backend python -m src.app.database.seed
 ```
 
 **Access the application:**
 
-| Service | URL |
-|---|---|
-| 🖥️ Frontend Dashboard | http://localhost:3000 |
-| 📡 API Swagger Docs | http://localhost:8000/docs |
-| ❤️ Health Check | http://localhost:8000/api/v1/health |
-| 🔍 Neo4j Browser | http://localhost:7474 |
+| Service | URL | Description |
+|---|---|---|
+| 🖥️ **Frontend Dashboard** | [http://localhost:3000](http://localhost:3000) | Interactive React operator dashboard |
+| 📡 **API Swagger Docs** | [http://localhost:8000/docs](http://localhost:8000/docs) | Interactive OpenAPI documentation |
+| ❤️ **Health Check** | [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health) | Live service & dependency health status |
+| 🔍 **Neo4j Browser** | [http://localhost:7474](http://localhost:7474) | Graph visualizer (`neo4j` / `gridpulse_neo4j`) |
 
 ```bash
 # Stop all services
 docker compose down
 
-# Stop and remove all data volumes
+# Stop and remove all persistent data volumes
 docker compose down -v
 ```
 
@@ -146,7 +146,7 @@ docker compose down -v
 git clone https://github.com/ThummarDarshan/bob-ai-hackathon-Eat-Code-Sleep.git
 cd bob-ai-hackathon-Eat-Code-Sleep
 
-# 2. Start databases via Docker
+# 2. Start PostgreSQL and Neo4j databases via Docker
 docker run -d --name gridpulse_pg \
   -e POSTGRES_USER=gridpulse \
   -e POSTGRES_PASSWORD=gridpulse_secret \
@@ -160,8 +160,8 @@ docker run -d --name gridpulse_neo4j \
 # 3. Set up Python virtual environment
 python -m venv venv
 
-# Windows:
-venv\Scripts\activate
+# Windows (PowerShell):
+venv\Scripts\Activate.ps1
 # macOS / Linux:
 source venv/bin/activate
 
@@ -172,7 +172,7 @@ pip install -r requirements.txt
 cp .env.example .env
 # Edit .env — ensure DATABASE_URL and NEO4J_URI point to localhost
 
-# 6. Seed the database with sample grid data
+# 6. Seed PostgreSQL and Neo4j with grid topology and telemetry
 python -m src.app.database.seed
 
 # 7. Start the FastAPI backend
@@ -186,17 +186,17 @@ npm install
 npm run dev
 ```
 
-Frontend available at **http://localhost:5173**, API at **http://localhost:8000/docs**.
+Frontend available at **http://localhost:3000**, API at **http://localhost:8000/docs**.
 
 ---
 
 ### 🧪 Run Tests
 
 ```bash
-# From the project root with venv active
-pytest tests/ -v
+# From the project root with your environment active:
+pytest -v
 
-# Expected result: 34 passed, 2 skipped
+# Expected result: 95 passed, 2 skipped (100% green)
 ```
 
 ---
