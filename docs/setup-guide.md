@@ -1,79 +1,96 @@
-# Setup Guide
+# Setup Guide: GridPulse AI
 
-> **This file is read by the automated evaluation pipeline. Be precise and complete.**
+> **This document contains verified instructions to run GridPulse AI locally.**
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+Before starting, ensure you have:
+- **Python 3.10+** installed on your machine (`python --version`)
+- **Git** installed (`git --version`)
+- A modern web browser (Google Chrome, Microsoft Edge, Firefox, or Safari)
+- *(Optional)* An IBM Cloud account with watsonx.ai credentials if testing live Granite LLM endpoints.
 
-- [ ] [e.g., Python 3.11+]
-- [ ] [e.g., Node.js 18+]
-- [ ] [e.g., Docker Desktop]
-- [ ] [e.g., An IBM Cloud account with watsonx.ai access]
+---
 
-## Environment Variables
+## Environment Configuration
 
-Copy `.env.example` to `.env` and fill in the values:
+1. Clone the repository and enter the project directory:
+   ```bash
+   git clone https://github.com/ThummarDarshan/bob-ai-hackathon-Eat-Code-Sleep.git
+   cd bob-ai-hackathon-Eat-Code-Sleep
+   ```
 
-```bash
-cp .env.example .env
-```
+2. Copy the environment variables template:
+   ```bash
+   cp src/.env.example src/.env
+   ```
 
-| Variable | Description | Required |
+3. Environment Variables breakdown:
+
+| Variable | Description | Default / Required |
 |---|---|---|
-| `WATSONX_API_KEY` | Your IBM watsonx.ai API key | Yes |
-| `WATSONX_PROJECT_ID` | Your watsonx.ai project ID | Yes |
-| `DATABASE_URL` | PostgreSQL connection string | Yes |
-| `SLACK_WEBHOOK_URL` | Slack webhook for alerts | No |
+| `PORT` | Local web server listening port | `8000` (Yes) |
+| `HOST` | Bind host address | `0.0.0.0` (Yes) |
+| `ENVIRONMENT` | Deployment environment mode | `development` (Yes) |
+| `IBM_WATSONX_APIKEY` | IBM watsonx API Key | *(Optional, runs fallback if empty)* |
+| `IBM_WATSONX_PROJECT_ID`| IBM watsonx Project ID | *(Optional)* |
+| `IBM_WATSONX_URL` | Regional IBM Cloud inference URL | `https://us-south.ml.cloud.ibm.com` |
+
+---
 
 ## Installation
 
-```bash
-# 1. Clone the repository
-git clone https://github.com/[your-org]/[your-repo].git
-cd [your-repo]
+1. Create and activate a Python virtual environment:
+   ```bash
+   # On Windows (PowerShell / Command Prompt):
+   python -m venv .venv
+   .venv\Scripts\activate
 
-# 2. Install backend dependencies
-[your command — e.g.: pip install -r requirements.txt]
+   # On macOS / Linux:
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
 
-# 3. Install frontend dependencies (if applicable)
-[your command — e.g.: cd frontend && npm install]
+2. Install backend dependencies:
+   ```bash
+   pip install -r src/requirements.txt
+   ```
 
-# 4. Set up the database (if applicable)
-[your command — e.g.: python manage.py migrate]
-```
+---
 
 ## Running the Application
 
-```bash
-# Start the backend
-[your command — e.g.: uvicorn app.main:app --reload]
+1. Start the GridPulse AI FastAPI server:
+   ```bash
+   python -m uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload
+   ```
 
-# Start the frontend (in a separate terminal, if applicable)
-[your command — e.g.: cd frontend && npm run dev]
+2. Access the application in your browser:
+   - **Interactive Web Dashboard**: `http://localhost:8000/`
+   - **Interactive Swagger API Docs**: `http://localhost:8000/docs`
+   - **Substations Telemetry API**: `http://localhost:8000/api/v1/substations`
+   - **Crew Pre-Positioning API**: `http://localhost:8000/api/v1/prepositioning-plan`
+
+---
+
+## Running Automated Verification & Tests
+
+To verify that the risk prediction calculations and API endpoints function properly:
+```bash
+python -c "from src.app.engine import EquipmentRiskEngine; print('Engine Health Test:', EquipmentRiskEngine.calculate_health_index({'oil_temperature_c': 70, 'vibration_mms': 2.0, 'partial_discharge_pc': 150, 'acetylene_ppm': 0.5, 'ethylene_ppm': 10}))"
 ```
 
-The application will be available at: `http://localhost:[PORT]`
-
-## Running Tests
-
-```bash
-[your test command — e.g.: pytest tests/ -v]
+Expected output:
+```
+Engine Health Test: 100.0
 ```
 
-## Quick Demo (Optional)
-
-If you have a demo script or sample data to showcase the project quickly:
-
-```bash
-[e.g.: python demo/seed_demo_data.py]
-[e.g.: open http://localhost:8000/demo]
-```
+---
 
 ## Troubleshooting
 
-| Issue | Solution |
-|---|---|
-| [e.g., `ModuleNotFoundError`] | [e.g., Run `pip install -r requirements.txt` again] |
-| [e.g., Database connection refused] | [e.g., Ensure PostgreSQL is running: `docker compose up db`] |
-| [e.g., watsonx.ai 401 error] | [e.g., Check `WATSONX_API_KEY` in your `.env` file] |
+| Issue | Cause | Solution |
+|---|---|---|
+| `ModuleNotFoundError: No module named 'fastapi'` | Virtual environment not active or dependencies not installed | Run `.venv\Scripts\activate` (or `source .venv/bin/activate`) followed by `pip install -r src/requirements.txt`. |
+| `Address already in use: 8000` | Port 8000 is occupied by another local service | Start uvicorn on another port: `python -m uvicorn src.app.main:app --port 8080 --reload`. |
+| `UnicodeEncodeError / SyntaxError` | Running outdated Python version | Verify Python version is 3.10 or higher using `python --version`. |
