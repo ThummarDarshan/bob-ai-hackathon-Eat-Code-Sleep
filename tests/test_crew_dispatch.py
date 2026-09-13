@@ -111,3 +111,53 @@ def test_low_priority_asset_does_not_get_crew():
     )
 
     assert len(result["crew_assignments"]) == 0
+
+def test_weather_vulnerability_drives_crew_prepositioning():
+    from src.app.core.weather_risk import (
+        analyze_storm_asset_vulnerability
+    )
+    from src.app.core.crew_dispatch import (
+        generate_crew_preposition_plan
+    )
+
+    weather = {
+        "wind_speed": 90.0,
+        "rainfall": 32.0,
+        "lightning_probability": 0.90,
+        "flood_risk": 0.70,
+        "temperature": 42.5,
+    }
+
+    vulnerability = analyze_storm_asset_vulnerability(
+        weather=weather,
+        health_index=40,
+        critical_facility=True,
+    )
+
+    assets = [
+        {
+            "asset_id": "TX-001",
+            "vulnerability_score": vulnerability["vulnerability_score"],
+            "critical_facility": True,
+            "dominant_hazard": vulnerability["dominant_hazard"],
+        }
+    ]
+
+    crews = [
+        {
+            "crew_id": "CREW-01",
+            "available": True,
+        }
+    ]
+
+    result = generate_crew_preposition_plan(
+        assets,
+        crews,
+        forecast_hours=48,
+    )
+
+    assert result["planning_horizon_hours"] == 48
+    assert result["priority_assets"][0]["asset_id"] == "TX-001"
+    assert result["priority_assets"][0]["priority"] == "CRITICAL"
+    assert result["crew_assignments"][0]["crew_id"] == "CREW-01"
+    assert result["crew_assignments"][0]["asset_id"] == "TX-001"
