@@ -1,26 +1,26 @@
 """
 GridPulse AI - Weather Risk & Storm-Asset Vulnerability Module
 
-This module calculates the weather-related risk for a grid asset
-using wind, rainfall, lightning, flood risk, and temperature.
-
-Output:
-    - weather_risk_score
-    - dominant_hazard
+Calculates weather-related risk for a grid asset using:
+- Wind
+- Rainfall
+- Lightning probability
+- Flood risk
+- Temperature extremes
 """
 
 
 def calculate_weather_risk(weather):
     """
-    Calculate the overall weather risk score for an asset.
+    Calculate the overall weather risk score.
 
     Expected input:
         {
-            "wind_speed": float,
-            "rainfall": float,
-            "lightning_probability": float,
-            "flood_risk": float,
-            "temperature": float
+            "wind_speed": float,              # km/h
+            "rainfall": float,                # mm/h
+            "lightning_probability": float,   # 0-1
+            "flood_risk": float,              # 0-1
+            "temperature": float              # Celsius
         }
 
     Returns:
@@ -30,31 +30,23 @@ def calculate_weather_risk(weather):
         }
     """
 
-    # ---------------------------------------------------------
-    # 1. Calculate individual hazard scores
-    # ---------------------------------------------------------
+    # Normalize weather hazards to a 0-1 risk scale
 
-    # Wind: 100 km/h or above = maximum risk
-    wind_score = min(weather["wind_speed"] / 100, 1.0)
+    # Contract threshold: >70 km/h is high risk
+    wind_score = min(weather["wind_speed"] / 70, 1.0)
 
-    # Rainfall: 100 mm or above = maximum risk
-    rainfall_score = min(weather["rainfall"] / 100, 1.0)
+    # Contract threshold: >30 mm/h is high risk
+    rainfall_score = min(weather["rainfall"] / 30, 1.0)
 
-    # Lightning probability: 100% = maximum risk
-    lightning_score = min(
-        weather["lightning_probability"] / 100,
-        1.0
-    )
+    # Contract already provides this as 0-1
+    lightning_score = min(max(weather["lightning_probability"], 0.0), 1.0)
 
-    # Flood risk is already expected as a percentage
-    flood_score = min(weather["flood_risk"] / 100, 1.0)
-
-    # ---------------------------------------------------------
-    # 2. Calculate temperature risk
-    # ---------------------------------------------------------
+    # Contract already provides this as 0-1
+    flood_score = min(max(weather["flood_risk"], 0.0), 1.0)
 
     temperature = weather["temperature"]
 
+    # Temperature extremes
     if temperature >= 45:
         temperature_score = 1.0
     elif temperature >= 40:
@@ -66,10 +58,6 @@ def calculate_weather_risk(weather):
     else:
         temperature_score = 0.0
 
-    # ---------------------------------------------------------
-    # 3. Store all hazard scores
-    # ---------------------------------------------------------
-
     hazards = {
         "wind": wind_score,
         "rainfall": rainfall_score,
@@ -78,10 +66,7 @@ def calculate_weather_risk(weather):
         "temperature": temperature_score,
     }
 
-    # ---------------------------------------------------------
-    # 4. Calculate weighted weather-risk score
-    # ---------------------------------------------------------
-
+    # Overall weather-risk weighting
     weather_risk_score = (
         wind_score * 0.25
         + rainfall_score * 0.15
@@ -90,18 +75,10 @@ def calculate_weather_risk(weather):
         + temperature_score * 0.15
     )
 
-    # ---------------------------------------------------------
-    # 5. Find the dominant hazard
-    # ---------------------------------------------------------
-
     dominant_hazard = max(
         hazards,
         key=hazards.get
     )
-
-    # ---------------------------------------------------------
-    # 6. Return result
-    # ---------------------------------------------------------
 
     return {
         "weather_risk_score": round(weather_risk_score, 2),
@@ -109,18 +86,14 @@ def calculate_weather_risk(weather):
     }
 
 
-# -------------------------------------------------------------
-# Simple local test
-# -------------------------------------------------------------
-
 if __name__ == "__main__":
 
     sample_weather = {
-        "wind_speed": 80,
-        "rainfall": 60,
-        "lightning_probability": 90,
-        "flood_risk": 40,
-        "temperature": 32,
+        "wind_speed": 68.5,
+        "rainfall": 22.0,
+        "lightning_probability": 0.75,
+        "flood_risk": 0.3,
+        "temperature": 38.2,
     }
 
     result = calculate_weather_risk(sample_weather)
