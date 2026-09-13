@@ -100,3 +100,59 @@ if __name__ == "__main__":
 
     print("Weather Risk Result:")
     print(result)
+
+def calculate_asset_vulnerability(
+    weather_risk_score,
+    health_index,
+    critical_facility=False
+):
+    """
+    Combine weather risk and asset degradation
+    to calculate storm-asset vulnerability.
+
+    Args:
+        weather_risk_score: Weather risk score from 0 to 1.
+        health_index: Asset health index from 0 to 100.
+        critical_facility: Whether the asset is a critical facility.
+
+    Returns:
+        {
+            "vulnerability_score": float,
+            "vulnerability_level": str
+        }
+    """
+
+    # Convert health index (0-100)
+    # into degradation risk (0-1).
+    degradation_risk = 1 - (health_index / 100)
+
+    # Keep values within valid range.
+    weather_risk_score = min(max(weather_risk_score, 0.0), 1.0)
+    degradation_risk = min(max(degradation_risk, 0.0), 1.0)
+
+    # Combine weather risk and asset degradation.
+    vulnerability_score = (
+        weather_risk_score * 0.6
+        + degradation_risk * 0.4
+    )
+
+    # Critical facilities receive additional priority.
+    if critical_facility:
+        vulnerability_score += 0.1
+
+    vulnerability_score = min(vulnerability_score, 1.0)
+
+    # Convert score into an easy-to-understand level.
+    if vulnerability_score >= 0.75:
+        vulnerability_level = "CRITICAL"
+    elif vulnerability_score >= 0.50:
+        vulnerability_level = "HIGH"
+    elif vulnerability_score >= 0.25:
+        vulnerability_level = "MEDIUM"
+    else:
+        vulnerability_level = "LOW"
+
+    return {
+        "vulnerability_score": round(vulnerability_score, 2),
+        "vulnerability_level": vulnerability_level
+    }
