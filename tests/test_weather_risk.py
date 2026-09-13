@@ -1,6 +1,7 @@
 from src.app.core.weather_risk import (
     calculate_weather_risk,
     calculate_asset_vulnerability,
+    analyze_storm_asset_vulnerability,
 )
 
 
@@ -95,3 +96,23 @@ def test_critical_facility_gets_higher_vulnerability():
     )
 
     assert critical_asset["vulnerability_score"] > normal_asset["vulnerability_score"]
+
+def test_storm_asset_vulnerability():
+    weather = {
+        "wind_speed": 90.0,
+        "rainfall": 32.0,
+        "lightning_probability": 0.90,
+        "flood_risk": 0.70,
+        "temperature": 42.5,
+    }
+
+    result = analyze_storm_asset_vulnerability(
+        weather=weather,
+        health_index=40,
+        critical_facility=True,
+    )
+
+    assert result["weather_risk_score"] > 0.7
+    assert result["health_index"] == 40
+    assert result["vulnerability_score"] > 0.7
+    assert result["vulnerability_level"] == "CRITICAL"

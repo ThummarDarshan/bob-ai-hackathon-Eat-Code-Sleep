@@ -76,15 +76,49 @@ def calculate_weather_risk(weather):
     )
 
     dominant_hazard = max(
-        hazards,
-        key=hazards.get
-    )
+    hazards,
+    key=hazards.get
+)
 
     return {
         "weather_risk_score": round(weather_risk_score, 2),
         "dominant_hazard": dominant_hazard,
     }
 
+def analyze_storm_asset_vulnerability(
+    weather,
+    health_index,
+    critical_facility=False
+):
+    """
+    Combine weather conditions and asset health
+    into a storm-asset vulnerability assessment.
+
+    Returns:
+        {
+            "weather_risk_score": float,
+            "dominant_hazard": str,
+            "health_index": float,
+            "vulnerability_score": float,
+            "vulnerability_level": str
+        }
+    """
+
+    weather_result = calculate_weather_risk(weather)
+
+    vulnerability_result = calculate_asset_vulnerability(
+        weather_risk_score=weather_result["weather_risk_score"],
+        health_index=health_index,
+        critical_facility=critical_facility,
+    )
+
+    return {
+        "weather_risk_score": weather_result["weather_risk_score"],
+        "dominant_hazard": weather_result["dominant_hazard"],
+        "health_index": health_index,
+        "vulnerability_score": vulnerability_result["vulnerability_score"],
+        "vulnerability_level": vulnerability_result["vulnerability_level"],
+    }
 
 if __name__ == "__main__":
 
