@@ -115,6 +115,7 @@ async def root():
     }
 
 
+@app.get("/health", include_in_schema=False)
 @app.get(f"{API_PREFIX}/health")
 async def health_check():
     """Service health check with dependency status."""
