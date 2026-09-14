@@ -14,9 +14,6 @@ from src.app.schemas.asset import (
 from src.app.schemas.risk import RiskScoreResponse
 from src.app.services.postgres_service import PostgresService
 
-import logging
-logger = logging.getLogger(__name__)
-
 router = APIRouter(prefix="/assets", tags=["Assets"])
 
 
@@ -29,26 +26,14 @@ async def get_all_assets(
     db: AsyncSession = Depends(get_db)
 ):
     """Returns all assets with their latest risk scores."""
-    try:
-        svc = PostgresService(db)
-        assets, total = await svc.get_all_assets(
-            risk_level=risk_level,
-            asset_type=asset_type,
-            limit=limit,
-            offset=offset
-        )
-        return AssetListResponse(assets=assets, total=total)
-    except Exception as e:
-        logger.warning(f"Database query failed in get_all_assets: {e}")
-        import json
-        from pathlib import Path
-        seeds_path = Path(__file__).parent.parent.parent.parent / "seeds" / "assets.json"
-        if seeds_path.exists():
-            with open(seeds_path) as f:
-                data = json.load(f)
-                items = [AssetResponse.model_validate(a) for a in data if a.get("asset_type") != "critical_facility"]
-                return AssetListResponse(assets=items, total=len(items))
-        return AssetListResponse(assets=[], total=0)
+    svc = PostgresService(db)
+    assets, total = await svc.get_all_assets(
+        risk_level=risk_level,
+        asset_type=asset_type,
+        limit=limit,
+        offset=offset
+    )
+    return AssetListResponse(assets=assets, total=total)
 
 
 @router.get("/{asset_id}", response_model=AssetDetailResponse)
