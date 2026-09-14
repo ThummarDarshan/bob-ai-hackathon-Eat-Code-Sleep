@@ -444,3 +444,61 @@ def classify_dga(gas_sample: dict) -> DGAResult:
         valid=True,
         validation_errors=warn,
     )
+
+
+def calculate_duval_triangle_coordinates(
+    ch4_ppm: float,
+    c2h4_ppm: float,
+    c2h2_ppm: float
+) -> dict:
+    """
+    Calculate Duval Triangle 1 coordinates (percentages of CH4, C2H4, C2H2).
+    According to IEC 60599 and IEEE C57.104, Duval Triangle 1 uses:
+      %CH4  = 100 * CH4  / (CH4 + C2H4 + C2H2)
+      %C2H4 = 100 * C2H4 / (CH4 + C2H4 + C2H2)
+      %C2H2 = 100 * C2H2 / (CH4 + C2H4 + C2H2)
+
+    Returns:
+        dict with percentages and approximate Duval Triangle 1 zone (PD, T1, T2, T3, D1, D2, DT).
+    """
+    ch4 = max(0.0, float(ch4_ppm or 0.0))
+    c2h4 = max(0.0, float(c2h4_ppm or 0.0))
+    c2h2 = max(0.0, float(c2h2_ppm or 0.0))
+
+    total = ch4 + c2h4 + c2h2
+    if total <= 0.0:
+        return {
+            "pct_ch4": 0.0,
+            "pct_c2h4": 0.0,
+            "pct_c2h2": 0.0,
+            "total_triangle_gas": 0.0,
+            "duval_zone": "NORMAL_OR_NO_GAS",
+        }
+
+    pct_ch4 = round(100.0 * ch4 / total, 2)
+    pct_c2h4 = round(100.0 * c2h4 / total, 2)
+    pct_c2h2 = round(100.0 * c2h2 / total, 2)
+
+    if pct_ch4 >= 98.0:
+        zone = "PD"  # Partial Discharge
+    elif pct_c2h2 >= 13.0 and pct_c2h4 < 23.0:
+        zone = "D1"  # Discharges of low energy (sparking)
+    elif pct_c2h2 >= 29.0 or (pct_c2h2 >= 13.0 and pct_c2h4 >= 23.0):
+        zone = "D2"  # Discharges of high energy (arcing)
+    elif pct_c2h4 >= 50.0:
+        zone = "T3"  # Thermal fault T > 700°C
+    elif pct_c2h4 >= 20.0 and pct_ch4 < 50.0:
+        zone = "T2"  # Thermal fault 300 < T < 700°C
+    elif pct_ch4 >= 50.0 and pct_c2h4 < 20.0 and pct_c2h2 < 4.0:
+        zone = "T1"  # Thermal fault T < 300°C
+    else:
+        zone = "DT"  # Mixed electrical & thermal
+
+    return {
+        "pct_ch4": pct_ch4,
+        "pct_c2h4": pct_c2h4,
+        "pct_c2h2": pct_c2h2,
+        "total_triangle_gas": round(total, 2),
+        "duval_zone": zone,
+    }
+
