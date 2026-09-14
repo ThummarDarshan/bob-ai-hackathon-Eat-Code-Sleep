@@ -42,6 +42,25 @@ def test_health_endpoint_returns_200():
 
 
 @skip_without_neo4j
+def test_root_health_endpoint_returns_200():
+    """GET /health alias should return 200 with status and version."""
+    from unittest.mock import patch, AsyncMock
+    from fastapi.testclient import TestClient
+    from src.app.main import app
+
+    with patch("src.app.database.postgres.init_db", new_callable=AsyncMock), \
+         patch("src.app.database.postgres.close_db", new_callable=AsyncMock), \
+         patch("src.app.database.neo4j.init_neo4j", new_callable=AsyncMock), \
+         patch("src.app.database.neo4j.close_neo4j", new_callable=AsyncMock):
+        client = TestClient(app, raise_server_exceptions=False)
+        response = client.get("/health")
+        assert response.status_code == 200
+        data = response.json()
+        assert "status" in data
+        assert "version" in data
+
+
+@skip_without_neo4j
 def test_root_endpoint():
     """GET / should return service and version info."""
     from unittest.mock import patch, AsyncMock
