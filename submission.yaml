@@ -39,10 +39,10 @@ submission:
     - "IBM Bob & watsonx natural language diagnostic Copilot delivering explainable failure root-cause and CAPA runbooks"
 
   tech_stack:
-    languages: ["Python", "JavaScript", "HTML5", "CSS3"]
-    frameworks: ["FastAPI", "Uvicorn", "Pydantic"]
+    languages: ["Python", "TypeScript", "JavaScript", "HTML5", "CSS3"]
+    frameworks: ["FastAPI", "Uvicorn", "Pydantic", "React", "Vite"]
     ibm_technologies: ["IBM Bob", "watsonx.ai", "IBM Granite"]
-    databases: ["SQLite", "In-Memory TimeSeries Cache"]
+    databases: ["PostgreSQL", "Neo4j", "SQLAlchemy Async"]
     other: ["Docker", "GitHub Actions", "Mermaid.js"]
 
   what_we_are_most_proud_of: >
