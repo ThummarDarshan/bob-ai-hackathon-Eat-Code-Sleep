@@ -1,1 +1,5 @@
-NOT DEPLOYED — run locally using docs/setup-guide.md
+https://gridpulse-ai-mu.vercel.app/
+
+# GridPulse AI — Live Deployment URL
+# Platform: Vercel Cloud Platform
+# Status: Live & Accessible

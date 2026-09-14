@@ -2,6 +2,9 @@
 
 > Proactive AI-driven resilience copilot for power utilities: fusing substation asset health telemetry with real-time weather analytics to predict catastrophic grid outages and optimize field crew dispatch.
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-gridpulse--ai--mu.vercel.app-0070f3?style=for-the-badge&logo=vercel&logoColor=white)](https://gridpulse-ai-mu.vercel.app/)
+[![Demo Video](https://img.shields.io/badge/Demo%20Video-YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/4jqHEdle__4)
+
 ---
 
 ## 👥 Team
@@ -224,8 +227,8 @@ The `/api/v1/health` endpoint shows live watsonx status.
 
 | Artifact | Link |
 |---|---|
-| 📹 Demo Video | [See demo/demo-video-link.txt](demo/demo-video-link.txt) |
-| 🌐 Live Demo | [See demo/live-demo-url.txt](demo/live-demo-url.txt) |
+| 📹 Demo Video | [Watch on YouTube (Demo)](https://youtu.be/4jqHEdle__4) ([demo/demo-video-link.txt](demo/demo-video-link.txt)) |
+| 🌐 Live Demo | [gridpulse-ai-mu.vercel.app](https://gridpulse-ai-mu.vercel.app/) ([demo/live-demo-url.txt](demo/live-demo-url.txt)) |
 | 🖼️ Screenshots | [See demo/screenshots/](demo/screenshots/) |
 | 📊 Presentation | [See presentation/](presentation/) |
 

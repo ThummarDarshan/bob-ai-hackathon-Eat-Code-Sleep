@@ -2,6 +2,9 @@
 
 This directory contains the official pitch presentation for **Team Eat-Code-Sleep** for the **Bob AI Innovation Hackathon (Track: AI - Problem U1)**.
 
+- 🌐 **Live Deployed Web Application**: [https://gridpulse-ai-mu.vercel.app/](https://gridpulse-ai-mu.vercel.app/)
+- 📹 **Demonstration Video Walkthrough**: [https://youtu.be/4jqHEdle__4](https://youtu.be/4jqHEdle__4)
+
 ---
 
 ## Slide Deck Files

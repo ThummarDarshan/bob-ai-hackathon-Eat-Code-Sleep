@@ -105,7 +105,7 @@ Once validation passes:
 - [x] `presentation/slides.pdf` / `slides.pptx` — pitch deck present
 - [x] GitHub Actions **✅ Validate Submission** is green
 - [x] Repository is **Public**
-- [ ] `demo/demo-video-link.txt` — final recorded video URL added
+- [x] `demo/demo-video-link.txt` — final recorded video URL added
 - [ ] Entry form submitted before the deadline
 
 ---
