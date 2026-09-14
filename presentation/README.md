@@ -1,30 +1,27 @@
-# Presentation
+# GridPulse AI — Presentation Deck
 
-Place your slide deck in this folder.
+This directory contains the official pitch presentation for **Team Eat-Code-Sleep** for the **Bob AI Innovation Hackathon (Track: AI - Problem U1)**.
 
-## Accepted Formats
+---
 
-  slides.pdf      ← Preferred (universally viewable)
-  slides.pptx     ← Acceptable
-  slides.key      ← Acceptable (macOS Keynote)
+## Slide Deck Files
 
-Rename your file to `slides.pdf` (or `slides.pptx`) so the evaluation
-pipeline can locate it reliably.
+| File | Format | Description |
+|---|---|---|
+| [`Eat-Code-Sleep.pptx`](./Eat-Code-Sleep.pptx) | **PowerPoint (.pptx)** | Official hackathon presentation deck with embedded high-resolution graphics, diagrams, and team profiles. |
+| [`slides.pptx`](./slides.pptx) | **PowerPoint (.pptx)** | Standard template-compatible copy of the PowerPoint deck. |
+| [`slides.pdf`](./slides.pdf) | **PDF Document** | Universally viewable exported slide deck (9 slides). |
 
-## Recommended Slide Structure (5–8 slides)
+---
 
-  Slide 1: Title — Project name, team name, track
-  Slide 2: Problem — What problem? Who has it? Why does it matter?
-  Slide 3: Solution — What you built in one clear diagram or screenshot
-  Slide 4: Architecture — How the system works technically
-  Slide 5: Demo / Key Feature — Screenshot or flow of your best feature
-  Slide 6: IBM Technologies — Specifically how you used them
-  Slide 7: Results / Impact — What does success look like? Any metrics?
-  Slide 8: Team — Names, roles, what each person built
+## Slide Outline
 
-## Tips
-
-- Keep slides visual — diagrams beat bullet points
-- One idea per slide
-- Font size minimum 24pt for readability
-- Do not paste large code blocks into slides — reference the repo instead
+1. **Title**: GridPulse AI — Power Outage & Grid Equipment Failure Advisor (Track: AI, Team Eat-Code-Sleep)
+2. **The Problem**: Catastrophic power transformer burnouts, $1M+/hour outage penalties, static maintenance blind spots, and climate storm stress.
+3. **The Solution**: Predictive AI platform fusing SCADA telemetry, IEEE C57 DGA, weather radar, and graph cascade analysis.
+4. **Grid Topology & Single-Line Flow**: Transmission to distribution hierarchy (`SUB` ➔ `TX` ➔ `FD` ➔ `CF: Hospital`).
+5. **System Architecture**: FastAPI backend, PostgreSQL 15, Neo4j 5 graph traversal, and React 18 control room dashboard.
+6. **Demo & Key Features**: Real-time asset health indices, automated work orders, and 48-hour field crew pre-positioning.
+7. **IBM Technologies**: IBM Bob for scaffolded development & runbooks; watsonx.ai and IBM Granite (Granite 3.3-8b / 13b) for explainable root-cause briefs.
+8. **Results & Impact**: Proactive outage prediction, reduced Mean Time to Recovery (MTTR), and critical hospital feed protection.
+9. **The Team**: Darshan Thummar (Lead), Shreeja Upadhyay, Kishan Vadsola, Vishv Undavia.
