@@ -47,12 +47,12 @@ export default function Dashboard() {
         {/* Summary stats */}
         <div className="grid-4 mb-6">
           {[
-            { label: 'Total Assets',    value: s.total_assets,       color: 'var(--blue-glow)',    sub: 'monitored' },
-            { label: 'Critical Risk',   value: s.critical_count,     color: 'var(--risk-critical)', sub: 'require immediate action' },
-            { label: 'High Risk',       value: s.high_count,         color: 'var(--risk-high)',    sub: 'inspect within 24h' },
-            { label: 'Active Orders',   value: s.active_work_orders, color: 'var(--amber)',        sub: 'work orders open' },
+            { label: 'Total Assets',    value: s.total_assets,       color: 'var(--blue-glow)',    sub: 'monitored', accent: 'stat-card--accent-blue' },
+            { label: 'Critical Risk',   value: s.critical_count,     color: 'var(--risk-critical)', sub: 'require immediate action', accent: 'stat-card--accent-red' },
+            { label: 'High Risk',       value: s.high_count,         color: 'var(--risk-high)',    sub: 'inspect within 24h', accent: 'stat-card--accent-orange' },
+            { label: 'Active Orders',   value: s.active_work_orders, color: 'var(--amber)',        sub: 'work orders open', accent: 'stat-card--accent-amber' },
           ].map(card => (
-            <div key={card.label} className="stat-card">
+            <div key={card.label} className={`stat-card ${card.accent}`}>
               <div className="stat-label">{card.label}</div>
               <div className="stat-value" style={{ color: card.color }}>{card.value}</div>
               <div className="stat-sub">{card.sub}</div>
@@ -81,7 +81,7 @@ export default function Dashboard() {
                 </thead>
                 <tbody>
                   {data!.top_risk_assets.map(a => (
-                    <tr key={a.asset_id} onClick={() => navigate(`/assets/${a.asset_id}`)}>
+                    <tr key={a.asset_id} className={`risk-row-${(a.risk_level ?? 'LOW').toLowerCase()}`} onClick={() => navigate(`/assets/${a.asset_id}`)}>
                       <td><span style={{ color: 'var(--blue-glow)' }}>{a.asset_id}</span><br /><span className="text-muted text-sm">{a.name}</span></td>
                       <td className="text-muted">{a.asset_type}</td>
                       <td><RiskBadge level={a.risk_level ?? 'LOW'} /></td>

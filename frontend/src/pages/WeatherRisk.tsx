@@ -47,7 +47,9 @@ export default function WeatherRisk() {
 
             {/* Weather table */}
             <div className="glass-card">
-              <div className="section-title mb-4">Weather Conditions by Asset</div>
+              <div className="section-header">
+                <span className="section-title">Weather Conditions by Asset</span>
+              </div>
               <table className="data-table">
                 <thead>
                   <tr>
@@ -66,9 +68,9 @@ export default function WeatherRisk() {
                     <tr><td colSpan={8}><div className="empty-state">No weather data available</div></td></tr>
                   ) : (
                     sorted.map(w => (
-                      <tr key={w.asset_id}>
+                      <tr key={w.asset_id} className={`risk-row-${w.weather_risk_score >= 0.7 ? 'critical' : w.weather_risk_score >= 0.4 ? 'high' : w.weather_risk_score >= 0.2 ? 'medium' : 'low'}`}>
                         <td>
-                          <div style={{ fontFamily: 'monospace', fontSize: '12px', color: 'var(--blue-glow)' }}>{w.asset_id}</div>
+                          <div style={{ color: 'var(--blue-glow)' }}>{w.asset_id}</div>
                           <div className="text-muted text-sm">{w.asset_name}</div>
                         </td>
                         <td style={{ color: w.wind_speed > 70 ? 'var(--risk-critical)' : w.wind_speed > 45 ? 'var(--risk-high)' : 'inherit' }}>

@@ -51,12 +51,12 @@ export default function RiskAnalysis() {
         {/* Summary stats */}
         <div className="grid-4 mb-6">
           {[
-            { label: 'CRITICAL', count: data?.critical_count ?? 0, color: 'var(--risk-critical)' },
-            { label: 'HIGH',     count: data?.high_count ?? 0,     color: 'var(--risk-high)' },
-            { label: 'MEDIUM',   count: data?.medium_count ?? 0,   color: 'var(--risk-medium)' },
-            { label: 'LOW',      count: data?.low_count ?? 0,      color: 'var(--risk-low)' },
+            { label: 'CRITICAL', count: data?.critical_count ?? 0, color: 'var(--risk-critical)', accent: 'stat-card--accent-red' },
+            { label: 'HIGH',     count: data?.high_count ?? 0,     color: 'var(--risk-high)',     accent: 'stat-card--accent-orange' },
+            { label: 'MEDIUM',   count: data?.medium_count ?? 0,   color: 'var(--risk-medium)',   accent: 'stat-card--accent-amber' },
+            { label: 'LOW',      count: data?.low_count ?? 0,      color: 'var(--risk-low)',      accent: 'stat-card--accent-blue' },
           ].map(item => (
-            <div key={item.label} className="stat-card">
+            <div key={item.label} className={`stat-card ${item.accent}`}>
               <div className="stat-label">{item.label}</div>
               <div className="stat-value" style={{ color: item.color }}>{item.count}</div>
               <div className="stat-sub">assets</div>
@@ -87,7 +87,7 @@ export default function RiskAnalysis() {
                 <tr><td colSpan={8}><div className="empty-state">No risk scores available</div></td></tr>
               ) : (
                 scores.map((s, idx) => (
-                  <tr key={s.asset_id} onClick={() => navigate(`/assets/${s.asset_id}`)}>
+                  <tr key={s.asset_id} className={`risk-row-${s.risk_level?.toLowerCase() ?? 'low'}`} onClick={() => navigate(`/assets/${s.asset_id}`)}>
                     <td className="text-muted">{idx + 1}</td>
                     <td>
                       <span style={{ color: 'var(--blue-glow)' }}>{s.asset_id}</span>

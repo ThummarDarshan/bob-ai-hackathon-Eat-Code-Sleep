@@ -58,7 +58,7 @@ export default function CrewRecommendations() {
                     <tr><td colSpan={4}><div className="empty-state">No recommendations available</div></td></tr>
                   ) : (
                     recommendations.map((r: any) => (
-                      <tr key={r.asset_id}>
+                      <tr key={r.asset_id} className={`risk-row-${(r.risk_level ?? 'LOW').toLowerCase()}`}>
                         <td>
                           <span style={{ color: 'var(--blue-glow)' }}>{r.asset_id}</span>
                           <div className="text-muted text-sm">{r.asset_name}</div>

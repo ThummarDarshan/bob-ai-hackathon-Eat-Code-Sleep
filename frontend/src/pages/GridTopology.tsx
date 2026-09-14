@@ -176,7 +176,9 @@ export default function GridTopologyPage() {
           {/* Selected node info */}
           {selected ? (
             <div className="glass-card">
-              <div className="section-title mb-4">{selected.name ?? selected.id}</div>
+              <div className="section-header">
+                <span className="section-title">{selected.name ?? selected.id}</span>
+              </div>
               <div style={{ fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div className="flex justify-between"><span className="text-muted">ID</span><span style={{ fontFamily: 'monospace', color: 'var(--blue-glow)' }}>{selected.id}</span></div>
                 <div className="flex justify-between"><span className="text-muted">Type</span><span>{selected.type}</span></div>
@@ -212,7 +214,9 @@ export default function GridTopologyPage() {
           )}
           {cascade && (
             <div className="glass-card">
-              <div className="section-title mb-4">🔴 Cascade Impact Analysis</div>
+              <div className="section-header">
+                <span className="section-title">🔴 Cascade Impact Analysis</span>
+              </div>
               <div style={{ fontSize: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div style={{ padding: '8px', background: 'rgba(239,68,68,0.08)', borderRadius: '6px', fontSize: '11px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
                   {cascade.explanation}

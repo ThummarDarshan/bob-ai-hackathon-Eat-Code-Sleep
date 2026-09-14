@@ -62,7 +62,7 @@ export default function Assets() {
                   <tr><td colSpan={7}><div className="empty-state">No assets found</div></td></tr>
                 ) : (
                   assets.map(a => (
-                    <tr key={a.asset_id} onClick={() => navigate(`/assets/${a.asset_id}`)}>
+                    <tr key={a.asset_id} className={`risk-row-${(a.risk_level ?? 'LOW').toLowerCase()}`} onClick={() => navigate(`/assets/${a.asset_id}`)}>
                       <td>
                         <span style={{ color: 'var(--blue-glow)' }}>{a.asset_id}</span><br />
                         <span className="text-muted text-sm">{a.name}</span>
