@@ -535,3 +535,37 @@ class TestRemainingUsefulLife:
         rul_low = calculate_remaining_useful_life(health_index=-10.0)
         assert rul_low["health_index"] == 0.0
 
+
+class TestDuvalTriangle:
+    """Tests for calculate_duval_triangle_coordinates in dga_classifier module."""
+
+    def test_all_zeros_handled_gracefully(self):
+        from src.app.core.dga_classifier import calculate_duval_triangle_coordinates
+
+        res = calculate_duval_triangle_coordinates(0.0, 0.0, 0.0)
+        assert res["total_triangle_gas"] == 0.0
+        assert res["pct_ch4"] == 0.0
+        assert res["duval_zone"] == "NORMAL_OR_NO_GAS"
+
+    def test_thermal_fault_t3_classification(self):
+        from src.app.core.dga_classifier import calculate_duval_triangle_coordinates
+
+        res = calculate_duval_triangle_coordinates(ch4_ppm=20.0, c2h4_ppm=75.0, c2h2_ppm=5.0)
+        assert res["pct_c2h4"] == 75.0
+        assert res["duval_zone"] == "T3"
+
+    def test_arcing_d2_classification(self):
+        from src.app.core.dga_classifier import calculate_duval_triangle_coordinates
+
+        res = calculate_duval_triangle_coordinates(ch4_ppm=30.0, c2h4_ppm=30.0, c2h2_ppm=40.0)
+        assert res["pct_c2h2"] == 40.0
+        assert res["duval_zone"] == "D2"
+
+    def test_percentages_sum_to_100(self):
+        from src.app.core.dga_classifier import calculate_duval_triangle_coordinates
+
+        res = calculate_duval_triangle_coordinates(ch4_ppm=45.0, c2h4_ppm=35.0, c2h2_ppm=20.0)
+        total_pct = res["pct_ch4"] + res["pct_c2h4"] + res["pct_c2h2"]
+        assert abs(total_pct - 100.0) < 0.1
+
+
