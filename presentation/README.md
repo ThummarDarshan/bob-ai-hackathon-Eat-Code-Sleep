@@ -8,8 +8,7 @@ This directory contains the official pitch presentation for **Team Eat-Code-Slee
 
 | File | Format | Description |
 |---|---|---|
-| [`Eat-Code-Sleep.pptx`](./Eat-Code-Sleep.pptx) | **PowerPoint (.pptx)** | Official hackathon presentation deck with embedded high-resolution graphics, diagrams, and team profiles. |
-| [`slides.pptx`](./slides.pptx) | **PowerPoint (.pptx)** | Standard template-compatible copy of the PowerPoint deck. |
+| [`slides.pptx`](./slides.pptx) | **PowerPoint (.pptx)** | Official hackathon presentation deck with embedded high-resolution graphics, diagrams, and team profiles. |
 | [`slides.pdf`](./slides.pdf) | **PDF Document** | Universally viewable exported slide deck (9 slides). |
 
 ---

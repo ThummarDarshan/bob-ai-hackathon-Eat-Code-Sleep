@@ -102,7 +102,7 @@ Once validation passes:
 - [x] `docs/setup-guide.md` — tested and reproducible setup instructions
 - [x] `src/` — all source code committed (no node_modules, no .env)
 - [x] `demo/screenshots/` — 6 working application screenshots cataloged
-- [x] `presentation/slides.pdf` / `Eat-Code-Sleep.pptx` — pitch deck present
+- [x] `presentation/slides.pdf` / `slides.pptx` — pitch deck present
 - [x] GitHub Actions **✅ Validate Submission** is green
 - [x] Repository is **Public**
 - [ ] `demo/demo-video-link.txt` — final recorded video URL added
