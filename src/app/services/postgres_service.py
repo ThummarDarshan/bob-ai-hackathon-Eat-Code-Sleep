@@ -180,6 +180,13 @@ class PostgresService:
 
     # ─── Work Orders ───────────────────────────────────────────────────────────
 
+    async def get_all_workorders(self) -> List[WorkOrderResponse]:
+        result = await self.db.execute(
+            select(WorkOrder).order_by(desc(WorkOrder.id))
+        )
+        wos = result.scalars().all()
+        return [WorkOrderResponse.model_validate(wo) for wo in wos]
+
     async def get_workorders(self, asset_id: str) -> List[WorkOrderResponse]:
         result = await self.db.execute(
             select(WorkOrder)

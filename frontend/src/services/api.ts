@@ -89,6 +89,9 @@ export const sendChatMessage = (message: string, context = {}): Promise<ChatResp
 export const getRecommendations = () =>
   api.get('/recommendations').then(r => r.data);
 
+export const getAllWorkOrders = (): Promise<WorkOrder[]> =>
+  api.get('/workorders').then(r => r.data);
+
 export const getAssetWorkOrders = (assetId: string): Promise<WorkOrder[]> =>
   api.get(`/assets/${assetId}/workorders`).then(r => r.data);
 

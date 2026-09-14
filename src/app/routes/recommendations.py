@@ -52,6 +52,13 @@ async def get_recommendations(db: AsyncSession = Depends(get_db)):
     return {"work_orders": recommendations, "total": len(recommendations)}
 
 
+@router.get("/workorders", response_model=List[WorkOrderResponse])
+async def get_all_workorders(db: AsyncSession = Depends(get_db)):
+    """Returns all work orders across the grid."""
+    svc = PostgresService(db)
+    return await svc.get_all_workorders()
+
+
 @router.get("/assets/{asset_id}/workorders", response_model=List[WorkOrderResponse])
 async def get_asset_workorders(asset_id: str, db: AsyncSession = Depends(get_db)):
     """Returns work orders for a specific asset."""

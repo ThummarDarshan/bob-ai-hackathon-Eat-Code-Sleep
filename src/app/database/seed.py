@@ -49,6 +49,7 @@ async def seed_database():
         await seed_dga(db)
         await seed_weather(db)
         await seed_incidents(db)
+        await seed_work_orders(db)
         await db.commit()
 
     # Seed Neo4j grid if connected
@@ -184,6 +185,27 @@ async def seed_incidents(db: AsyncSession):
             severity=r["severity"],
             description=r["description"],
         ))
+async def seed_work_orders(db: AsyncSession):
+    from sqlalchemy import select
+    from src.app.models.risk import WorkOrder
+    rows = await load_json("work_orders.json")
+    print(f"Seeding {len(rows)} work orders...")
+    for r in rows:
+        existing = await db.execute(
+            select(WorkOrder).where(
+                WorkOrder.asset_id == r["asset_id"],
+                WorkOrder.description == r["description"]
+            )
+        )
+        if not existing.scalar_one_or_none():
+            db.add(WorkOrder(
+                asset_id=r["asset_id"],
+                priority=r["priority"],
+                status=r["status"],
+                assigned_crew=r.get("assigned_crew"),
+                scheduled_time=parse_ts(r.get("scheduled_time")) if r.get("scheduled_time") else None,
+                description=r["description"],
+            ))
     await db.flush()
 
 

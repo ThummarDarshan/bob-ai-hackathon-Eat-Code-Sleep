@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getRecommendations, getAssetWorkOrders, getCrewPrepositionPlan } from '../services/api';
+import { getRecommendations, getAssetWorkOrders, getCrewPrepositionPlan, getAllWorkOrders } from '../services/api';
 import WorkOrderRow from '../components/WorkOrderRow';
 import type { WorkOrder } from '../types';
 import RiskBadge from '../components/RiskBadge';
@@ -15,14 +15,19 @@ export default function CrewRecommendations() {
     Promise.all([
       getRecommendations().catch(() => ({ work_orders: [] })),
       getCrewPrepositionPlan().catch(() => null),
+      getAllWorkOrders().catch(() => []),
     ])
-      .then(([recs, plan]) => {
+      .then(([recs, plan, wos]) => {
         setRecommendations(recs.work_orders ?? []);
         setCrewPlan(plan);
-        const assetIds = [...new Set((recs.work_orders ?? []).map((r: any) => r.asset_id))] as string[];
-        return Promise.all(assetIds.map((aid: string) => getAssetWorkOrders(aid).catch(() => [])));
+        if (wos && wos.length > 0) {
+          setWorkOrders(wos);
+        } else {
+          const assetIds = [...new Set((recs.work_orders ?? []).map((r: any) => r.asset_id))] as string[];
+          return Promise.all(assetIds.map((aid: string) => getAssetWorkOrders(aid).catch(() => [])))
+            .then(w => setWorkOrders(w.flat()));
+        }
       })
-      .then(wos => setWorkOrders(wos.flat()))
       .catch(e => setError(e.message))
       .finally(() => setLoading(false));
   }, []);
@@ -33,6 +38,7 @@ export default function CrewRecommendations() {
 
   const openWorkOrders = workOrders.filter(wo => wo.status !== 'completed' && wo.status !== 'cancelled');
   const completedWorkOrders = workOrders.filter(wo => wo.status === 'completed' || wo.status === 'cancelled');
+  const assignments = crewPlan?.crew_assignments || crewPlan?.assignments || [];
 
   return (
     <div>
@@ -87,7 +93,7 @@ export default function CrewRecommendations() {
                 )}
               </div>
 
-              {crewPlan?.assignments && crewPlan.assignments.length > 0 ? (
+              {assignments.length > 0 ? (
                 <div style={{ overflowX: 'auto' }}>
                   <table className="data-table mb-4">
                     <thead>
@@ -102,33 +108,39 @@ export default function CrewRecommendations() {
                       </tr>
                     </thead>
                     <tbody>
-                      {crewPlan.assignments.map((asgn: any) => (
-                        <tr key={asgn.crew_id}>
-                          <td>
-                            <strong>{asgn.crew_name}</strong>
-                            <div className="text-muted text-xs">{asgn.crew_id}</div>
-                          </td>
-                          <td>
-                            <span style={{ color: 'var(--blue-glow)', fontWeight: 600 }}>{asgn.target_asset_id}</span>
-                            <div className="text-muted text-xs">{asgn.target_asset_name}</div>
-                          </td>
-                          <td>
-                            <span className={`risk-badge ${asgn.priority?.toUpperCase()}`}>{asgn.priority}</span>
-                          </td>
-                          <td>
-                            <span style={{ color: 'var(--text-primary)' }}>{asgn.suggested_staging_hub}</span>
-                          </td>
-                          <td>
-                            <span className="text-sm font-mono">{asgn.recommended_staging_window}</span>
-                          </td>
-                          <td className="text-sm">
-                            {asgn.weather_threat}
-                          </td>
-                          <td className="text-xs text-muted" style={{ maxWidth: '300px' }}>
-                            {asgn.reason}
-                          </td>
-                        </tr>
-                      ))}
+                      {assignments.map((asgn: any) => {
+                        const assetId = asgn.asset_id || asgn.target_asset_id;
+                        const assetName = asgn.asset_name || asgn.target_asset_name;
+                        const stagingHub = asgn.staging_hub || asgn.suggested_staging_hub;
+                        const stagingWindow = asgn.staging_window || asgn.recommended_staging_window;
+                        return (
+                          <tr key={asgn.crew_id + '-' + assetId}>
+                            <td>
+                              <strong>{asgn.crew_name || asgn.crew_id}</strong>
+                              <div className="text-muted text-xs">{asgn.crew_id}</div>
+                            </td>
+                            <td>
+                              <span style={{ color: 'var(--blue-glow)', fontWeight: 600 }}>{assetId}</span>
+                              <div className="text-muted text-xs">{assetName}</div>
+                            </td>
+                            <td>
+                              <span className={`risk-badge ${asgn.priority?.toUpperCase()}`}>{asgn.priority}</span>
+                            </td>
+                            <td>
+                              <span style={{ color: 'var(--text-primary)' }}>{stagingHub}</span>
+                            </td>
+                            <td>
+                              <span className="text-sm font-mono">{stagingWindow}</span>
+                            </td>
+                            <td className="text-sm">
+                              {asgn.weather_threat}
+                            </td>
+                            <td className="text-xs text-muted" style={{ maxWidth: '300px' }}>
+                              {asgn.reason}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -140,7 +152,9 @@ export default function CrewRecommendations() {
                   { name: 'East Metro Depot',         zone: 'East Metro',  description: 'Covers Critical Facilities & Hospital Feeders' },
                   { name: 'West Valley Station',      zone: 'West Rural',  description: 'Covers Heavy Rainfall & Wind-Exposed Lines' },
                 ].map(hub => {
-                  const hubCount = crewPlan?.assignments?.filter((a: any) => a.suggested_staging_hub?.toLowerCase().includes(hub.name.toLowerCase().split(' ')[0].toLowerCase())).length ?? 0;
+                  const hubCount = (crewPlan?.staging_hubs?.find((h: any) => h.name?.toLowerCase().includes(hub.name.toLowerCase().split(' ')[0]))?.deployments_needed)
+                    ?? assignments.filter((a: any) => (a.staging_hub || a.suggested_staging_hub)?.toLowerCase().includes(hub.name.toLowerCase().split(' ')[0])).length
+                    ?? 0;
                   return (
                     <div key={hub.name} className="weather-alert-item" style={{ background: 'rgba(15,23,42,0.6)', border: '1px solid var(--glass-border)' }}>
                       <div className="font-semibold" style={{ marginBottom: '4px' }}>{hub.name}</div>
