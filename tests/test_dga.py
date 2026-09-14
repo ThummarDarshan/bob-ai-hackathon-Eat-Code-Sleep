@@ -504,3 +504,34 @@ class TestTelemetryIntegration:
         assert result["health_band"] in ("POOR", "CRITICAL"), (
             f"Arcing record should be POOR/CRITICAL, got {result['health_band']}"
         )
+
+
+class TestRemainingUsefulLife:
+    """Tests for calculate_remaining_useful_life in asset_health module."""
+
+    def test_healthy_asset_has_long_rul(self):
+        from src.app.core.asset_health import calculate_remaining_useful_life
+
+        rul = calculate_remaining_useful_life(health_index=90.0, degradation_rate=0.1)
+        assert rul["estimated_operating_hours_remaining"] > 500000
+        assert rul["estimated_days_remaining"] > 20000
+        assert not rul["urgent_inspection_required"]
+        assert rul["recommended_inspection_days"] == 90
+
+    def test_degraded_asset_requires_urgent_inspection(self):
+        from src.app.core.asset_health import calculate_remaining_useful_life
+
+        rul = calculate_remaining_useful_life(health_index=20.0, degradation_rate=0.1)
+        assert rul["estimated_operating_hours_remaining"] == 0.0
+        assert rul["urgent_inspection_required"] is True
+        assert rul["recommended_inspection_days"] == 1
+
+    def test_boundary_clamping_hi(self):
+        from src.app.core.asset_health import calculate_remaining_useful_life
+
+        rul_high = calculate_remaining_useful_life(health_index=150.0)
+        assert rul_high["health_index"] == 100.0
+
+        rul_low = calculate_remaining_useful_life(health_index=-10.0)
+        assert rul_low["health_index"] == 0.0
+
