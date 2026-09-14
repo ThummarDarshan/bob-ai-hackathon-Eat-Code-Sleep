@@ -55,16 +55,18 @@ export default function AssetDetailPage() {
   return (
     <div>
       <div className="top-bar">
-        <button className="btn btn-ghost" style={{ fontSize: '12px' }} onClick={() => navigate('/assets')}>← Back</button>
+        <button className="btn btn-ghost text-sm" onClick={() => navigate('/assets')}>← Back</button>
         <h2>{asset.name}</h2>
         <RiskBadge level={asset.risk_level ?? 'LOW'} score={asset.final_risk_score} />
       </div>
       <div className="page-content">
-        <div className="grid-2 gap-4 mb-6">
+        <div className="grid-2 gap-6 mb-6">
           {/* Asset info */}
           <div className="glass-card">
-            <div className="section-title mb-4">Asset Information</div>
-            <div className="grid-2" style={{ fontSize: '13px', gap: '12px' }}>
+            <div className="section-header">
+              <span className="section-title">Asset Information</span>
+            </div>
+            <div className="grid-2 text-sm" style={{ gap: '12px' }}>
               {[
                 ['Asset ID', asset.asset_id],
                 ['Type', asset.asset_type],
@@ -83,10 +85,13 @@ export default function AssetDetailPage() {
           </div>
 
           {/* Risk gauge */}
-          <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+          <div className="glass-card flex flex-col items-center justify-between gap-4">
+            <div className="section-header" style={{ width: '100%' }}>
+              <span className="section-title">Risk Assessment</span>
+            </div>
             <RiskGauge score={asset.final_risk_score ?? 0} level={asset.risk_level ?? 'LOW'} size={140} />
             {latest_risk && (
-              <div className="grid-2" style={{ width: '100%', fontSize: '12px', gap: '8px' }}>
+              <div className="grid-2 text-sm" style={{ width: '100%', gap: '8px' }}>
                 {[
                   ['Failure Prob', latest_risk.failure_probability],
                   ['Asset Health', latest_risk.asset_health_risk],
@@ -97,7 +102,7 @@ export default function AssetDetailPage() {
                 ].map(([lbl, val]) => (
                   <div key={lbl as string} style={{ textAlign: 'center', padding: '6px', background: 'rgba(15,23,42,0.5)', borderRadius: '6px' }}>
                     <div className="text-muted" style={{ fontSize: '10px', marginBottom: '2px' }}>{lbl}</div>
-                    <div style={{ fontWeight: 600 }}>{typeof val === 'number' ? (val * 100).toFixed(0) + '%' : val}</div>
+                    <div className="font-semibold">{typeof val === 'number' ? (val * 100).toFixed(0) + '%' : val}</div>
                   </div>
                 ))}
               </div>
@@ -106,11 +111,13 @@ export default function AssetDetailPage() {
         </div>
 
         {/* Sensor + DGA + Weather readings */}
-        <div className="grid-3 gap-4 mb-6">
+        <div className="grid-3 gap-6 mb-6">
           <div className="glass-card">
-            <div className="section-title mb-4">📡 Sensor Readings</div>
+            <div className="section-header">
+              <span className="section-title">📡 Sensor Readings</span>
+            </div>
             {latest_sensor ? (
-              <div style={{ fontSize: '13px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div className="flex flex-col gap-2 text-sm">
                 {[
                   ['Temperature', latest_sensor.temperature + '°C', latest_sensor.temperature > 85 ? 'var(--risk-critical)' : latest_sensor.temperature > 70 ? 'var(--risk-high)' : 'var(--green)'],
                   ['Vibration', latest_sensor.vibration + ' mm/s', latest_sensor.vibration > 4 ? 'var(--risk-high)' : 'var(--green)'],
@@ -118,7 +125,7 @@ export default function AssetDetailPage() {
                 ].map(([lbl, val, clr]) => (
                   <div key={lbl as string} className="flex justify-between">
                     <span className="text-muted">{lbl}</span>
-                    <span style={{ color: clr as string, fontWeight: 600 }}>{val}</span>
+                    <span className="font-semibold" style={{ color: clr as string }}>{val}</span>
                   </div>
                 ))}
               </div>
@@ -126,9 +133,11 @@ export default function AssetDetailPage() {
           </div>
 
           <div className="glass-card">
-            <div className="section-title mb-4">🔬 DGA Analysis</div>
+            <div className="section-header">
+              <span className="section-title">🔬 DGA Analysis</span>
+            </div>
             {latest_dga ? (
-              <div style={{ fontSize: '13px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div className="flex flex-col gap-2 text-sm">
                 {[
                   ['H₂ (Hydrogen)', latest_dga.h2, 100],
                   ['CH₄ (Methane)', latest_dga.ch4, 120],
@@ -151,9 +160,11 @@ export default function AssetDetailPage() {
           </div>
 
           <div className="glass-card">
-            <div className="section-title mb-4">🌩 Weather</div>
+            <div className="section-header">
+              <span className="section-title">🌩 Weather Data</span>
+            </div>
             {latest_weather ? (
-              <div style={{ fontSize: '13px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div className="flex flex-col gap-2 text-sm">
                 {[
                   ['Wind Speed', latest_weather.wind_speed + ' km/h'],
                   ['Rainfall', latest_weather.rainfall + ' mm/h'],
@@ -173,7 +184,9 @@ export default function AssetDetailPage() {
 
         {/* AI Advisory */}
         <div className="glass-card mb-6">
-          <div className="section-title mb-4">🤖 AI Advisory</div>
+          <div className="section-header">
+            <span className="section-title">🤖 AI Advisory</span>
+          </div>
           <div className="flex gap-2 mb-4">
             <input
               className="input"
@@ -187,10 +200,10 @@ export default function AssetDetailPage() {
             </button>
           </div>
           {advisory && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="flex flex-col gap-4">
               <div style={{ padding: '12px', background: 'rgba(59,130,246,0.08)', borderRadius: '8px', border: '1px solid rgba(59,130,246,0.2)' }}>
-                <div style={{ fontSize: '12px', color: 'var(--blue-glow)', marginBottom: '4px' }}>Summary</div>
-                <div style={{ fontSize: '13px' }}>{advisory.summary}</div>
+                <div className="text-sm" style={{ color: 'var(--blue-glow)', marginBottom: '4px' }}>Summary</div>
+                <div className="text-sm">{advisory.summary}</div>
               </div>
               <div className="grid-3 gap-4">
                 {[
@@ -199,14 +212,14 @@ export default function AssetDetailPage() {
                   { title: '✅ Actions', items: advisory.recommended_actions, color: 'var(--green)' },
                 ].map(section => (
                   <div key={section.title}>
-                    <div style={{ fontSize: '12px', color: section.color, marginBottom: '8px', fontWeight: 600 }}>{section.title}</div>
+                    <div className="text-sm font-semibold" style={{ color: section.color, marginBottom: '8px' }}>{section.title}</div>
                     <ul style={{ paddingLeft: '16px', fontSize: '12px', lineHeight: '1.8', color: 'var(--text-secondary)' }}>
                       {section.items.map((item, i) => <li key={i}>{item}</li>)}
                     </ul>
                   </div>
                 ))}
               </div>
-              <div style={{ display: 'flex', gap: '12px', fontSize: '12px' }}>
+              <div className="flex gap-4 text-sm">
                 <span>Urgency: <strong style={{ color: advisory.urgency === 'IMMEDIATE' ? 'var(--risk-critical)' : advisory.urgency === 'URGENT' ? 'var(--risk-high)' : 'var(--amber)' }}>{advisory.urgency}</strong></span>
                 <span className="text-muted">Provider: {advisory.provider}</span>
               </div>
@@ -216,7 +229,9 @@ export default function AssetDetailPage() {
 
         {/* Incidents */}
         <div className="glass-card">
-          <div className="section-title mb-4">📋 Incident History</div>
+          <div className="section-header">
+            <span className="section-title">📋 Incident History</span>
+          </div>
           {incidents.length === 0 ? (
             <div className="empty-state">No incidents recorded</div>
           ) : (
@@ -226,7 +241,7 @@ export default function AssetDetailPage() {
                 {incidents.map(inc => (
                   <tr key={inc.id}>
                     <td className="text-muted">{new Date(inc.timestamp).toLocaleDateString()}</td>
-                    <td>{inc.failure_type}</td>
+                    <td className="font-semibold">{inc.failure_type}</td>
                     <td><RiskBadge level={inc.severity.toUpperCase()} /></td>
                     <td style={{ maxWidth: '400px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{inc.description}</td>
                   </tr>

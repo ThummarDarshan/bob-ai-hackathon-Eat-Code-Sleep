@@ -404,8 +404,28 @@ select.input option {
   background: var(--navy-mid);
 }
 
+/* ── Section Divider ────────────────────────────────────────────────────────── */
+.section-divider {
+  height: 1px;
+  background: var(--glass-border);
+  margin: 16px 0;
+  border: none;
+}
+
+.glass-card-interactive {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.glass-card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  border-color: rgba(99, 179, 237, 0.3);
+}
+
 /* ── Scrollbar ─────────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(99,179,237,0.2); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(99,179,237,0.4); }
+

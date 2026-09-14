@@ -12,22 +12,21 @@ export default function AssetCard({ asset }: AssetCardProps) {
 
   return (
     <div
-      className="glass-card"
-      style={{ cursor: 'pointer', transition: 'border-color 0.15s' }}
+      className="glass-card glass-card-interactive"
       onClick={() => navigate(`/assets/${asset.asset_id}`)}
     >
       <div className="flex justify-between items-center mb-4">
         <div>
-          <div style={{ fontSize: '13px', fontWeight: 600 }}>{asset.name}</div>
-          <div className="text-muted text-sm">{asset.asset_id} · {asset.asset_type}</div>
+          <div className="font-semibold" style={{ fontSize: '14px' }}>{asset.name}</div>
+          <div className="text-muted text-sm"><span style={{ color: 'var(--blue-glow)' }}>{asset.asset_id}</span> · {asset.asset_type}</div>
         </div>
         <RiskBadge level={level} score={score} />
       </div>
-      <div className="grid-2" style={{ fontSize: '12px' }}>
+      <div className="grid-2 text-sm">
         <div>
           <div className="text-muted">Status</div>
-          <div style={{ color: asset.status === 'active' ? 'var(--green)' : 'var(--amber)' }}>
-            {asset.status}
+          <div style={{ color: asset.status === 'active' ? 'var(--green)' : asset.status === 'maintenance' ? 'var(--amber)' : 'var(--text-muted)' }}>
+            ● {asset.status}
           </div>
         </div>
         <div>
@@ -36,8 +35,8 @@ export default function AssetCard({ asset }: AssetCardProps) {
         </div>
         {asset.critical_facility && (
           <div style={{ gridColumn: '1/-1' }}>
-            <span style={{ fontSize: '11px', color: 'var(--risk-critical)', background: 'rgba(239,68,68,0.1)', padding: '2px 8px', borderRadius: '4px' }}>
-              ⚠ Critical Facility: {asset.facility_type ?? 'unknown'}
+            <span style={{ fontSize: '11px', color: 'var(--risk-critical)', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', padding: '2px 8px', borderRadius: '4px' }}>
+              ⚠ Critical Facility: {asset.facility_type ?? 'yes'}
             </span>
           </div>
         )}
@@ -45,3 +44,4 @@ export default function AssetCard({ asset }: AssetCardProps) {
     </div>
   );
 }
+
