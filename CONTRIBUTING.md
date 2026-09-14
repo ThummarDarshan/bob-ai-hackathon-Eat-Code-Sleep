@@ -19,8 +19,8 @@ The judges depend on this structure to review your entry — deviations may affe
 ## Step 2 — Clone Your Fork Locally
 
 ```bash
-git clone https://github.com/[your-org]/bob-ai-hackathon-[your-team-name].git
-cd bob-ai-hackathon-[your-team-name]
+git clone https://github.com/ThummarDarshan/bob-ai-hackathon-Eat-Code-Sleep.git
+cd bob-ai-hackathon-Eat-Code-Sleep
 ```
 
 ---
@@ -89,29 +89,23 @@ yq '.' submission.yaml   # checks YAML is valid
 Once validation passes:
 
 1. Copy your repository URL:
-   `https://github.com/[your-org]/bob-ai-hackathon-[your-team-name]`
+   `https://github.com/ThummarDarshan/bob-ai-hackathon-Eat-Code-Sleep`
 
-2. Submit it via the **official entry form** at:
-   `[ORGANIZER: INSERT FORM URL HERE]`
-
-3. **Deadline:** `[ORGANIZER: INSERT DEADLINE HERE]`
-
-> ⚠️ Submissions after the deadline will not be reviewed.
-> Changes after the deadline are not considered — make sure everything is complete before submitting.
+2. Submit it via the official hackathon entry form before the deadline.
 
 ---
 
 ## Checklist Before You Submit
 
-- [ ] `submission.yaml` — all required fields filled
-- [x] `README.md` — no `[placeholder]` text remaining
-- [ ] `docs/setup-guide.md` — someone else can run your project using these instructions
-- [x] `src/` — all source code committed (no `node_modules`, no `.env`)
-- [ ] `demo/demo-video-link.txt` — real video URL (3–5 min showing the app working)
-- [ ] `demo/screenshots/` — at least 3 screenshots of the running application
-- [ ] `presentation/slides.pdf` — slide deck present
+- [x] `submission.yaml` — all required fields filled
+- [x] `README.md` — no placeholder text remaining
+- [x] `docs/setup-guide.md` — tested and reproducible setup instructions
+- [x] `src/` — all source code committed (no node_modules, no .env)
+- [x] `demo/screenshots/` — 6 working application screenshots cataloged
+- [x] `presentation/slides.pdf` / `Eat-Code-Sleep.pptx` — pitch deck present
 - [x] GitHub Actions **✅ Validate Submission** is green
 - [x] Repository is **Public**
+- [ ] `demo/demo-video-link.txt` — final recorded video URL added
 - [ ] Entry form submitted before the deadline
 
 ---
