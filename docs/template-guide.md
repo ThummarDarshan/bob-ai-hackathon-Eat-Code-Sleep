@@ -103,7 +103,7 @@ bob-ai-hackathon-Eat-Code-Sleep/
 │   └── generate_slides.py   ← Automated slide generator script
 │
 ├── seeds/                   ← Seed data (assets, telemetry, DGA, weather, work orders)
-├── tests/                   ← Automated test suite (147 passing tests)
+├── tests/                   ← Automated test suite (157 passing tests)
 ├── CONTRIBUTING.md          ← Submission instructions
 ├── .gitignore               ← Configured for Python, Node, Docker, .env
 └── .github/
@@ -191,7 +191,7 @@ The human-readable front page of the repository, providing:
 - Architecture highlights and risk fusion breakdown
 - Quickstart Docker instructions (`docker compose up --build`)
 - Demo video and presentation slide links
-- Test status: **147 / 147 passed**
+- Test status: **157 / 157 passed**
 
 ---
 
@@ -219,7 +219,7 @@ flowchart TD
 ```
 
 #### `docs/setup-guide.md`
-Step-by-step instructions for running via Docker Compose (`docker compose up --build`) or local Python/Node environments, database seeding, and running the 147-test pytest suite.
+Step-by-step instructions for running via Docker Compose (`docker compose up --build`) or local Python/Node environments, database seeding, and running the 157-test pytest suite.
 
 ---
 
@@ -284,7 +284,7 @@ Verified status for **Team Eat-Code-Sleep**:
 **Technical**
 - [x] No `.env` credentials committed (enforced by `.gitignore`)
 - [x] No `node_modules/`, `.venv/`, or build artefacts committed
-- [x] Test suite passing (**147 / 147 passed** via `pytest`)
+- [x] Test suite passing (**157 / 157 passed** via `pytest`)
 - [x] GitHub Actions **✅ Validate Submission** confirmed green
 - [x] Repository visibility is **Public**
 
@@ -298,7 +298,7 @@ Verified status for **Team Eat-Code-Sleep**:
 
 | # | Criterion | Pts | How GridPulse AI Meets It |
 |---|---|---|---|
-| 1 | Technical Implementation Quality | 25 | Full-stack FastAPI + React 18, PostgreSQL 15, Neo4j 5, async pipelines, 147 automated tests |
+| 1 | Technical Implementation Quality | 25 | Full-stack FastAPI + React 18, PostgreSQL 15, Neo4j 5, async pipelines, 157 automated tests |
 | 2 | Innovation & Differentiation | 25 | Fuses biochemical DGA (IEEE C57) with weather radar and graph cascade BFS |
 | 3 | Problem Depth & Vision | 15 | Tackles $1M/hr transformer burnouts, hospital feeder protection, and climate stress |
 | 4 | Working Demo & Functionality | 15 | Fully containerized, reproducible in 1 command (`docker compose up --build`) |
@@ -314,7 +314,7 @@ Verified status for **Team Eat-Code-Sleep**:
 | Template placeholders left behind | All docs and READMEs audited; zero `[placeholder]` tags remain |
 | Secret leakage in git history | `.env` ignored; `.env.example` contains sanitized dummy defaults |
 | Private repository setting | Repository is confirmed **Public** |
-| Broken or mocked backend | Fully operational backend with real database queries and 147 unit/e2e tests |
+| Broken or mocked backend | Fully operational backend with real database queries and 157 unit/e2e tests |
 | Missing presentation deck | `presentation/slides.pdf` generated and committed |
 
 ---

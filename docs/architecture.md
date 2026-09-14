@@ -88,7 +88,7 @@ flowchart LR
 | **Relational DB** | PostgreSQL 15, SQLAlchemy Async | Stores time-series telemetry, DGA samples, assets, and work orders |
 | **Graph DB** | Neo4j 5, Cypher (Async Driver) | Models transmission network topology & cascade failure propagation |
 | **AI / Foundation Model** | IBM watsonx.ai + IBM Granite | Generates explainable root-cause briefs and mitigation runbooks |
-| **Testing & Deployment** | Pytest (147 tests), Docker Compose | Fully automated test suite and containerized orchestration |
+| **Testing & Deployment** | Pytest (157 tests), Docker Compose | Fully automated test suite and containerized orchestration |
 
 ---
 

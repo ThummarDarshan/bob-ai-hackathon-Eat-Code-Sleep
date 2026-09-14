@@ -196,7 +196,7 @@ Frontend available at **http://localhost:3000**, API at **http://localhost:8000/
 # From the project root with your environment active:
 pytest -v
 
-# Expected result: 147 passed (100% green)
+# Expected result: 157 passed (100% green)
 ```
 
 ---

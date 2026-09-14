@@ -12,7 +12,7 @@
 ### 1. Clone and Configure
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/ThummarDarshan/bob-ai-hackathon-Eat-Code-Sleep.git
 cd bob-ai-hackathon-Eat-Code-Sleep
 
 # Create .env from template
