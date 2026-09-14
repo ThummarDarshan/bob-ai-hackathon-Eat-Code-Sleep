@@ -58,28 +58,34 @@ flowchart TD
         Fallback["🛡️ Local Rule-Based Advisory<br/>Deterministic Fallback Engine<br/>Zero-Downtime Guarantee"]:::ai
     end
 
-    %% Connections
-    Sensors -->|JSON / Telemetry Stream| API_GW
-    DGAStream -->|DGA Records| API_GW
-    Meteo -->|Forecast Snapshots| API_GW
+    %% Ingestion to Gateway
+    Sensors -->|"Telemetry Streams"| API_GW
+    DGAStream -->|"DGA Records"| API_GW
+    Meteo -->|"Forecast Snapshots"| API_GW
 
-    PRESENTATION <-->|HTTP / REST (Axios)| API_GW
+    %% Presentation <-> API Gateway
+    UI_Dash & UI_Grid & UI_Risk & UI_Crew & UI_AI -->|"REST API Requests"| API_GW
+    API_GW -->|"JSON Telemetry & State"| UI_Dash & UI_Grid & UI_Risk & UI_Crew & UI_AI
 
+    %% Internal Backend Dispatch
     API_GW --> DGA_Eng
     API_GW --> Risk_Eng
     API_GW --> Cascade_Eng
     API_GW --> Crew_Eng
 
+    %% Inter-Engine Pipelines
     DGA_Eng --> Risk_Eng
     Cascade_Eng --> Risk_Eng
     Risk_Eng --> Crew_Eng
 
-    Risk_Eng <-->|SQLAlchemy Async / asyncpg| Postgres
-    Crew_Eng <-->|Work Orders CRUD| Postgres
-    Cascade_Eng <-->|Cypher Queries / Bolt| Neo4j
+    %% Persistence Pipelines
+    Risk_Eng <-->|"SQLAlchemy Async"| Postgres
+    Crew_Eng <-->|"Work Orders CRUD"| Postgres
+    Cascade_Eng <-->|"Cypher Queries / Bolt"| Neo4j
 
-    Risk_Eng -->|Context Vector + Topology| Granite
-    Risk_Eng -.->|On Offline / Rate Limit| Fallback
+    %% AI Advisory Pipelines
+    Risk_Eng -->|"Context Vector + Topology"| Granite
+    Risk_Eng -.->|"On Offline / Fallback"| Fallback
     Granite --> API_GW
     Fallback --> API_GW
 ```
@@ -97,8 +103,8 @@ flowchart LR
     end
 
     subgraph S2["Step 2: External Stress"]
-        B1["Wind Gusts (>60 km/h)"] --> WX["Weather Risk Index<br/>(0.0 — 1.0)"]
-        B2["Lightning Strikes (10km)"] --> WX
+        B1["Wind Gusts over 60 km/h"] --> WX["Weather Risk Index<br/>(0.0 — 1.0)"]
+        B2["Lightning Strikes within 10km"] --> WX
         B3["Excessive Ambient Temp"] --> WX
     end
 
@@ -147,7 +153,7 @@ sequenceDiagram
     UI->>API: POST /api/v1/advisory/chat { prompt, asset_context }
     API->>DB: Fetch latest sensor readings, DGA Rogers Ratios, open work orders
     DB-->>API: TX-001: Acetylene=38ppm (Arcing), Temp=92°C, WO-2026-001 Open
-    API->>Graph: Fetch downstream cascade footprint (Feeds FD-001 -> CF-001 Hospital)
+    API->>Graph: Fetch downstream cascade footprint (Feeds FD-001 to CF-001 Hospital)
     Graph-->>API: Downstream assets confirmed
 
     API->>AI: Synthesize dynamic context prompt with IEEE diagnostics + weather vectors
@@ -193,8 +199,14 @@ sequenceDiagram
 - **Graph Cascade Analyzer**:
   - Cypher BFS algorithms trace dependency chains from substation transformers to distribution feeders and critical civic nodes (hospitals, water treatment facilities, emergency networks).
 - **Multi-Factor Risk Fusion**:
-  $$\text{Base Risk} = 0.30 \cdot P_f + 0.20 \cdot \text{HI}_{\text{risk}} + 0.15 \cdot W_{\text{risk}} + 0.20 \cdot \text{Grid}_{\text{impact}} + 0.15 \cdot \text{Cascade}_{\text{risk}}$$
-  $$\text{Final Risk} = \min\left(1.0, \text{Base Risk} \times \text{Critical Multiplier}\right)$$
+
+$$
+\text{Base Risk} = 0.30 \cdot P_f + 0.20 \cdot \text{HI}_{\text{risk}} + 0.15 \cdot W_{\text{risk}} + 0.20 \cdot \text{Grid}_{\text{impact}} + 0.15 \cdot \text{Cascade}_{\text{risk}}
+$$
+
+$$
+\text{Final Risk} = \min\left(1.0, \text{Base Risk} \times \text{Critical Multiplier}\right)
+$$
 
 ### 4.4 Hybrid Persistence Tier
 - **Relational Storage (PostgreSQL 15)**:
