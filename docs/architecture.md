@@ -62,7 +62,7 @@ GridPulse AI is a full-stack power grid risk monitoring and advisory platform bu
 | Backend | Python 3.11, FastAPI, Uvicorn, Pydantic v2 |
 | Relational DB | PostgreSQL 15 (SQLAlchemy async + Alembic) |
 | Graph DB | Neo4j 5 (async neo4j driver, Cypher queries) |
-| AI / LLM | IBM watsonx.ai + IBM Granite 13B Instruct |
+| AI / LLM | IBM watsonx.ai + IBM Granite (Granite 3.3-8b / 13B Instruct) |
 | Fallback AI | Rule-based local advisory engine |
 | Containers | Docker + Docker Compose |
 | Testing | Pytest + pytest-asyncio |
@@ -109,9 +109,13 @@ final_risk_score = clamp(base_risk × critical_multiplier, 0, 1)
 | GET | `/api/v1/assets` | All assets with risk scores |
 | GET | `/api/v1/assets/{id}` | Full asset detail |
 | GET | `/api/v1/risk` | All risk scores ranked |
-| GET | `/api/v1/grid/topology` | Full grid graph |
+| GET | `/api/v1/grid/topology` | Full grid graph (single-line schematic + GIS) |
 | GET | `/api/v1/grid/assets/{id}/impact` | Cascade failure analysis |
 | GET | `/api/v1/weather` | Weather risk per asset |
+| GET | `/api/v1/weather/crew-preposition` | 48-Hour field crew staging & dispatch plan |
 | POST | `/api/v1/advisory` | Asset-specific AI advisory |
-| POST | `/api/v1/advisory/chat` | Free-form AI chat |
-| GET | `/api/v1/recommendations` | Auto-generated work orders |
+| POST | `/api/v1/advisory/chat` | Dynamic context-aware free-form AI chat |
+| GET | `/api/v1/recommendations` | Auto-generated work order recommendations |
+| GET | `/api/v1/workorders` | All open & completed work orders |
+| POST | `/api/v1/workorders` | Create new work order |
+| PATCH | `/api/v1/workorders/{id}` | Update work order status and field notes |

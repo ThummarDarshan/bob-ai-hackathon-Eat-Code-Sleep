@@ -151,7 +151,7 @@ GridPulse_AI/
 │   ├── services/          # PostgresService, Neo4jService, IntegrationAdapters
 │   └── database/          # Postgres + Neo4j drivers + seed script
 │
-├── seeds/                 # JSON seed data (assets, telemetry, DGA, weather, incidents)
+├── seeds/                 # JSON seed data (assets, telemetry, DGA, weather, incidents, work orders)
 ├── tests/                 # Pytest test suite
 ├── alembic/               # Database migrations
 ├── docker-compose.yml
