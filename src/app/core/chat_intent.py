@@ -173,26 +173,26 @@ def detect_chat_intent(message: str, resolved_assets: List[str]) -> ChatIntent:
             return ChatIntent.WEATHER_RISK
         return ChatIntent.LIGHTNING_ASSETS
 
-    # 4. DGA warning signs across assets: "which assets have dga warning", "assets with dga"
+    # 4. Cascading failure: "what happens if TX-001 fails", "cascading failure", "most dangerous cascade", "if TX-001 fails"
+    if any(k in msg for k in ["what happens if", "if tx-", "fails", "fail", "cascad", "downstream", "outage spread"]):
+        return ChatIntent.CASCADE_IMPACT
+
+    # 5. DGA warning signs across assets: "which assets have dga warning", "assets with dga"
     if ("which" in msg or "assets" in msg or "transformers" in msg) and ("dga" in msg or "gas" in msg or "arcing" in msg or "acetylene" in msg):
         if not resolved_assets:
             return ChatIntent.DGA_WARNING_ASSETS
 
-    # 5. DGA Analysis for specific asset: "What does DGA indicate for TX-001?", "DGA of TX-001"
+    # 6. DGA Analysis for specific asset: "What does DGA indicate for TX-001?", "DGA of TX-001"
     if any(k in msg for k in ["dga", "dissolved gas", "acetylene", "ethylene", "hydrogen", "arcing", "methane"]):
         return ChatIntent.DGA_ANALYSIS
 
-    # 6. Asset Health Index: "health index of TX-001", "condition of TX-001", "health score"
+    # 7. Asset Health Index: "health index of TX-001", "condition of TX-001", "health score"
     if any(k in msg for k in ["health index", "health score", "ahi", "health band", "condition of"]):
         return ChatIntent.ASSET_HEALTH
 
-    # 7. Weather risk: "vulnerable to the storm", "weather affecting", "storm vulnerability"
+    # 8. Weather risk: "vulnerable to the storm", "weather affecting", "storm vulnerability"
     if any(k in msg for k in ["weather", "storm", "wind", "hurricane", "flood", "rain", "vulnerable to the storm"]):
         return ChatIntent.WEATHER_RISK
-
-    # 8. Cascading failure: "what happens if TX-001 fails", "cascading failure", "most dangerous cascade", "if TX-001 fails"
-    if any(k in msg for k in ["what happens if", "if tx-", "fails", "fail", "cascad", "downstream", "outage spread"]):
-        return ChatIntent.CASCADE_IMPACT
 
     # 9. Critical facility queries: "critical facilities affected", "facilities affected", "hospital", "water plant"
     if any(k in msg for k in ["critical facilit", "hospital", "water plant", "airport", "facilities affected"]):

@@ -454,23 +454,30 @@ URGENCY: <CRITICAL | URGENT | WATCH | ROUTINE>
             path = casc.get("cascade_path", [primary["asset_id"]])
             facs = casc.get("affected_facilities", [])
             fac_names = [f.get("name", f.get("asset_id")) for f in facs]
+            health = primary.get("health", {})
+            dga = primary.get("dga", {})
+            crew = primary.get("crew", {})
 
             fac_str = f"reaching critical facility: **{', '.join(fac_names)}**" if fac_names else "with no direct critical facility disruption"
+            dga_note = f"- Internal Degradation: DGA indicates active **{health.get('dga_fault_type', 'thermal/arcing')}** fault (Acetylene C2H2: {dga.get('c2h2', 0):.1f} ppm, Health Index: {health.get('health_index', 50):.1f}/100).\n" if dga else ""
+            hub = crew.get("staging_hub", "North Operations Center")
+            eq = crew.get("required_equipment", "Mobile Transformer Backup Unit")
 
             resp = (
                 f"BOTTOM LINE:\n"
                 f"If **{primary['name']} ({primary['asset_id']})** fails, the outage cascades through **{casc.get('affected_asset_count', 0)}** downstream asset(s) {fac_str}.\n\n"
                 f"WHY:\n"
                 f"- Cascade Path: {' → '.join(path)}.\n"
+                f"{dga_note}"
                 f"- Dependency Depth: {casc.get('dependency_depth', 1)} hops across grid topology.\n"
                 f"- Cascade Risk Score: {casc.get('cascade_risk', 0.2):.2f}, Grid Impact: {casc.get('grid_impact', 0.3):.2f}.\n\n"
                 f"IMPACT:\n"
                 f"- {casc.get('explanation', 'Downstream power disruption across feeders.')}\n"
                 f"- Service disruption to approximately 42,000 customers.\n\n"
                 f"ACTION:\n"
-                f"1. Arm emergency automatic load-shedding scheme on downstream feeders.\n"
-                f"2. Notify operations at {', '.join(fac_names) if fac_names else 'substation dispatch'}.\n"
-                f"3. Stage mobile transformer unit at North Operations Center.\n\n"
+                f"1. Pre-position emergency response crews at {hub} with {eq}.\n"
+                f"2. Arm automatic load transfer on downstream feeders to protect {', '.join(fac_names) if fac_names else 'critical facilities'}.\n"
+                f"3. Execute 48-hour crew pre-positioning protocol and elevate telemetry polling.\n\n"
                 f"URGENCY:\n"
                 f"{'CRITICAL' if facs else 'HIGH'}"
             )
