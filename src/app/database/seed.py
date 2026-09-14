@@ -51,6 +51,43 @@ async def seed_database():
         await seed_incidents(db)
         await db.commit()
 
+    # Seed Neo4j grid if connected
+    try:
+        from src.app.database.neo4j import get_neo4j_session
+        from src.app.services.neo4j_service import Neo4jService
+        assets_data = await load_json("assets.json")
+        async with get_neo4j_session() as neo4j_session:
+            neo4j_svc = Neo4jService(neo4j_session)
+            await neo4j_svc.seed_grid(assets_data)
+            print("✅ Neo4j grid seeded successfully!")
+    except Exception as e:
+        print(f"Notice: Neo4j seeding skipped ({e}).")
+
+    # Compute and persist initial risk scores
+    try:
+        from src.app.core.risk_engine import RiskEngine
+        async with AsyncSession_() as db:
+            neo4j_svc = None
+            try:
+                from src.app.database.neo4j import get_neo4j_session
+                from src.app.services.neo4j_service import Neo4jService
+                async with get_neo4j_session() as neo4j_session:
+                    neo4j_svc = Neo4jService(neo4j_session)
+            except Exception:
+                pass
+            risk_engine = RiskEngine(db, neo4j_svc)
+            assets_data = await load_json("assets.json")
+            print(f"Computing initial risk scores for {len(assets_data)} assets...")
+            for a in assets_data:
+                try:
+                    await risk_engine.compute_risk(a["asset_id"])
+                except Exception as e:
+                    print(f"Warning computing risk for {a['asset_id']}: {e}")
+            await db.commit()
+            print("✅ Initial risk scores computed and saved!")
+    except Exception as e:
+        print(f"Notice: Initial risk computation skipped ({e}).")
+
     await engine.dispose()
     print("✅ Seeding complete!")
 

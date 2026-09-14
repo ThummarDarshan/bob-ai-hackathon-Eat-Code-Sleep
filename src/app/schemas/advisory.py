@@ -32,6 +32,11 @@ class ChatResponse(BaseModel):
     response: str
     provider: str
     timestamp: datetime
+    asset_id: Optional[str] = None
+    risk_level: Optional[str] = None
+    risk_score: Optional[float] = None
+    recommended_actions: Optional[List[str]] = None
+    data_sources: Optional[List[str]] = None
 
 
 class AdvisoryRecord(BaseModel):

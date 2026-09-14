@@ -155,6 +155,11 @@ export interface ChatResponse {
   response: string;
   provider: string;
   timestamp: string;
+  asset_id?: string;
+  risk_level?: RiskLevel;
+  risk_score?: number;
+  recommended_actions?: string[];
+  data_sources?: string[];
 }
 
 export interface DashboardData {

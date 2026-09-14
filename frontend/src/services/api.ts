@@ -67,6 +67,15 @@ export const getAllWeather = () =>
 export const getAssetWeather = (assetId: string) =>
   api.get(`/weather/${assetId}`).then(r => r.data);
 
+export const getCrewPrepositionPlan = (crews?: any[]) =>
+  api.post('/weather/crew-preposition', {
+    crews: crews || [
+      { crew_id: 'CREW-01', available: true },
+      { crew_id: 'CREW-02', available: true },
+      { crew_id: 'CREW-03', available: true },
+    ]
+  }).then(r => r.data);
+
 // ─── Advisory ─────────────────────────────────────────────────────────────────
 
 export const getAssetAdvisory = (assetId: string, question: string): Promise<AdvisoryResponse> =>

@@ -54,11 +54,19 @@ class PostgresService:
 
         return responses, total
 
+    async def _scalar_or_none(self, result):
+        if result is None:
+            return None
+        val = result.scalar_one_or_none() if hasattr(result, "scalar_one_or_none") else None
+        if hasattr(val, "__await__"):
+            val = await val
+        return val
+
     async def get_asset(self, asset_id: str) -> Optional[Asset]:
         result = await self.db.execute(
             select(Asset).where(Asset.asset_id == asset_id)
         )
-        return result.scalar_one_or_none()
+        return await self._scalar_or_none(result)
 
     async def get_asset_detail(self, asset_id: str) -> Optional[AssetDetailResponse]:
         asset = await self.get_asset(asset_id)
@@ -76,20 +84,37 @@ class PostgresService:
             .order_by(desc(Incident.timestamp))
             .limit(10)
         )
-        incidents_raw = result.scalars().all()
+        scalars = result.scalars() if hasattr(result, "scalars") else None
+        incidents_raw = scalars.all() if scalars and hasattr(scalars, "all") else []
+        if hasattr(incidents_raw, "__await__"):
+            incidents_raw = await incidents_raw
 
         ar = AssetResponse.model_validate(asset)
         if risk:
             ar.risk_level = risk.risk_level
             ar.final_risk_score = risk.final_risk_score
+        risk_dict = None
+        if risk:
+            risk_dict = {
+                "asset_id": getattr(risk, "asset_id", asset_id),
+                "failure_probability": getattr(risk, "failure_probability", 0.0),
+                "asset_health_risk": getattr(risk, "asset_health_risk", 0.0),
+                "weather_risk": getattr(risk, "weather_risk", 0.0),
+                "grid_impact": getattr(risk, "grid_impact", 0.0),
+                "cascade_risk": getattr(risk, "cascade_risk", 0.0),
+                "critical_multiplier": getattr(risk, "critical_multiplier", 1.0),
+                "final_risk_score": getattr(risk, "final_risk_score", 0.0),
+                "risk_level": getattr(risk, "risk_level", "LOW"),
+                "timestamp": getattr(risk, "timestamp", None).isoformat() if getattr(risk, "timestamp", None) and hasattr(getattr(risk, "timestamp", None), "isoformat") else None,
+            }
 
         return AssetDetailResponse(
             asset=ar,
             latest_sensor=SensorReadingResponse.model_validate(sensor) if sensor else None,
             latest_dga=DGAReadingResponse.model_validate(dga) if dga else None,
             latest_weather=WeatherReadingResponse.model_validate(weather) if weather else None,
-            latest_risk=risk.__dict__ if risk else None,
-            incidents=[IncidentResponse.model_validate(i) for i in incidents_raw]
+            latest_risk=risk_dict,
+            incidents=[IncidentResponse.model_validate(i) for i in (incidents_raw or [])]
         )
 
     # ─── Sensor Readings ───────────────────────────────────────────────────────
@@ -101,7 +126,7 @@ class PostgresService:
             .order_by(desc(SensorReading.timestamp))
             .limit(1)
         )
-        return result.scalar_one_or_none()
+        return await self._scalar_or_none(result)
 
     # ─── DGA Readings ──────────────────────────────────────────────────────────
 
@@ -112,7 +137,7 @@ class PostgresService:
             .order_by(desc(DGAReading.timestamp))
             .limit(1)
         )
-        return result.scalar_one_or_none()
+        return await self._scalar_or_none(result)
 
     # ─── Weather Readings ──────────────────────────────────────────────────────
 
@@ -123,7 +148,7 @@ class PostgresService:
             .order_by(desc(WeatherReading.timestamp))
             .limit(1)
         )
-        return result.scalar_one_or_none()
+        return await self._scalar_or_none(result)
 
     # ─── Risk Scores ───────────────────────────────────────────────────────────
 
@@ -134,7 +159,7 @@ class PostgresService:
             .order_by(desc(RiskScore.timestamp))
             .limit(1)
         )
-        return result.scalar_one_or_none()
+        return await self._scalar_or_none(result)
 
     async def save_risk_score(self, score_data: dict) -> RiskScore:
         score = RiskScore(
@@ -220,6 +245,33 @@ class PostgresService:
                 "description": i.description,
             }
             for i in incidents
+        ]
+
+    async def get_incidents_for_asset(self, asset_id: str, limit: int = 5) -> List[dict]:
+        """Returns historical incident records for a specific asset."""
+        try:
+            result = await self.db.execute(
+                select(Incident)
+                .where(Incident.asset_id == asset_id)
+                .order_by(desc(Incident.timestamp))
+                .limit(limit)
+            )
+            scalars = result.scalars()
+            incidents = scalars.all() if hasattr(scalars, "all") else []
+            if hasattr(incidents, "__await__"):
+                incidents = await incidents
+        except Exception:
+            incidents = []
+        return [
+            {
+                "id": getattr(i, "id", None),
+                "asset_id": getattr(i, "asset_id", asset_id),
+                "timestamp": getattr(i, "timestamp", None).isoformat() if getattr(i, "timestamp", None) and hasattr(getattr(i, "timestamp", None), "isoformat") else None,
+                "failure_type": getattr(i, "failure_type", "historical_fault"),
+                "severity": getattr(i, "severity", "medium"),
+                "description": getattr(i, "description", ""),
+            }
+            for i in (incidents or [])
         ]
 
     # ─── Advisory ──────────────────────────────────────────────────────────────

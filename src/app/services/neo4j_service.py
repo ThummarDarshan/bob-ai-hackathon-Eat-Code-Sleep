@@ -85,6 +85,7 @@ class Neo4jService:
         nodes = []
         async for record in node_result:
             node = dict(record["n"])
+            node["id"] = node.get("asset_id", "")
             node["type"] = record["labels"][0] if record["labels"] else "Unknown"
             nodes.append(node)
 
@@ -174,16 +175,23 @@ class Neo4jService:
         return paths
 
     async def calculate_graph_impact(self, asset_id: str) -> float:
-        """Returns normalized graph impact score (0-1)."""
+        """Returns normalized graph impact score (0-1) dynamically derived from Neo4j."""
         downstream = await self.get_downstream_assets(asset_id)
         facilities = await self.get_affected_facilities(asset_id)
 
         asset_count = len(downstream)
         facility_count = len(facilities)
 
+        try:
+            total_assets = await self.get_total_assets() or TOTAL_ASSETS
+            total_facilities = await self.get_total_facilities() or TOTAL_FACILITIES
+        except Exception:
+            total_assets = TOTAL_ASSETS
+            total_facilities = TOTAL_FACILITIES
+
         # Weighted normalized score
-        asset_score = min(1.0, asset_count / TOTAL_ASSETS) * 0.5
-        facility_score = min(1.0, facility_count / max(TOTAL_FACILITIES, 1)) * 0.5
+        asset_score = min(1.0, asset_count / max(total_assets, 1)) * 0.5
+        facility_score = min(1.0, facility_count / max(total_facilities, 1)) * 0.5
 
         return round(asset_score + facility_score, 3)
 

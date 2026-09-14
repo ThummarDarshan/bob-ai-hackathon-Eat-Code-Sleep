@@ -28,12 +28,12 @@ Power transformer and substation failures cost utilities **over $1M/hour** in bl
 **What makes it unique:**
 
 - 🧬 **IEEE C57.104 DGA Intelligence** — classifies fault *type* (thermal / arcing / partial discharge) from dissolved gas ratios, not just raw thresholds
-- 🌦️ **Storm-Asset Vulnerability Matrix** — cross-references live weather with each asset's degradation state to compute compounded failure probability *hours before landfall*
-- 📊 **Cascading Failure Graph Scoring** — ranks assets by grid topology impact; a failure cascading to 3 downstream nodes scores higher than an isolated one
-- 🚁 **48-Hour Crew Pre-Positioning Engine** — stages repair crews at optimal hubs *before* failures occur, cutting MTTR from hours to minutes
-- 🏥 **Critical Facility Multiplier** — hospitals, water plants, and emergency services are automatically weighted to the top of the priority queue
-- 🔁 **Closed-Loop Incident Learning** — every resolved incident recalibrates the failure signature model, improving accuracy each storm season
-- 🗣️ **Bob NL Advisory Interface** — operators ask plain-English questions; Bob synthesises all data layers into actionable diagnostics and SOPs
+- 🌦️ **Storm-Asset Vulnerability Matrix** — cross-references weather severity with each asset's degradation state to compute compounded failure probability hours before landfall
+- 📊 **Cascading Failure Graph Scoring** — ranks assets by Neo4j grid topology impact; downstream asset & facility paths dynamically determine grid impact and cascade risk
+- 🚁 **48-Hour Crew Pre-Positioning Engine** — stages repair crews at optimal hubs (North Operations Center, East Metro Depot, West Valley Station) before failures occur, cutting MTTR
+- 🏥 **Critical Facility Multiplier** — hospitals, water plants, and emergency services are automatically weighted to the top of the operational priority queue
+- 🔁 **Historical Incident Context** — cross-references historical failure records, fault recurrence, and maintenance history to provide data-driven operational context in advisories
+- 🗣️ **Natural-Language Advisory Interface** — operators ask plain-English questions; system synthesises all data layers into structured operational diagnostics with IBM Granite or deterministic local fallback
 
 ---
 
@@ -43,8 +43,8 @@ Power transformer and substation failures cost utilities **over $1M/hour** in bl
 - **Weather-Risk Fusion** — per-asset failure probability from wind, lightning, flood, and temperature extremes
 - **Severity-Ranked Work Orders** — cascading impact + critical facility weighting drives the maintenance queue
 - **Pre-emptive Crew Dispatch** — 48-hour staging plan generated before failures, not after
-- **Bob & watsonx.ai Copilot** — natural-language root-cause analysis and step-by-step SOPs
-- **Self-Improving Models** — historical incident feedback loop continuously sharpens predictions
+- **Bob & watsonx.ai Copilot** — natural-language root-cause analysis and step-by-step SOPs with deterministic local fallback
+- **Historical Incident Tracking** — correlates previous equipment failures and recurrence history with active asset health
 
 ---
 
@@ -52,10 +52,10 @@ Power transformer and substation failures cost utilities **over $1M/hour** in bl
 
 | Category | Technologies |
 |---|---|
-| **Languages** | Python 3.10+, JavaScript (ES6+), HTML5, CSS3 |
-| **Frameworks** | FastAPI, Uvicorn, Pydantic |
-| **IBM Technologies** | IBM Bob, watsonx.ai, IBM Granite Models |
-| **Data & Storage** | SQLite / In-Memory TimeSeries State Cache |
+| **Languages** | Python 3.11+, TypeScript, JavaScript (ES6+), HTML5, CSS3 |
+| **Frameworks** | FastAPI, Uvicorn, Pydantic v2, React 18, Vite |
+| **IBM Technologies** | IBM watsonx.ai, IBM Granite Models |
+| **Data & Storage** | PostgreSQL 15, Neo4j 5 Graph Database, SQLAlchemy Async |
 | **Design & Visualization**| Modern Glassmorphic CSS, Mermaid.js, Chart.js / SVG Visualizers |
 
 ---
@@ -196,7 +196,7 @@ Frontend available at **http://localhost:3000**, API at **http://localhost:8000/
 # From the project root with your environment active:
 pytest -v
 
-# Expected result: 95 passed, 2 skipped (100% green)
+# Expected result: 147 passed (100% green)
 ```
 
 ---

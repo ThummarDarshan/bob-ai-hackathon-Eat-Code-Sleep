@@ -9,7 +9,7 @@ interface RiskBadgeProps {
 export default function RiskBadge({ level, score }: RiskBadgeProps) {
   return (
     <span className={`risk-badge ${level}`}>
-      {level}{score !== undefined ? ` ${(score * 100).toFixed(0)}%` : ''}
+      {level}{score !== undefined && score !== null ? ` ${(score * 100).toFixed(0)}%` : ''}
     </span>
   );
 }
