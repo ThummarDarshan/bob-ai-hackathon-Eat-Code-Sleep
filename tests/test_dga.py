@@ -569,3 +569,22 @@ class TestDuvalTriangle:
         assert abs(total_pct - 100.0) < 0.1
 
 
+class TestDGASeverityWeight:
+    """Tests for get_dga_severity_weight in dga_classifier module."""
+
+    def test_severity_weight_mappings(self):
+        from src.app.core.dga_classifier import get_dga_severity_weight
+
+        assert get_dga_severity_weight("LOW") == 0.0
+        assert get_dga_severity_weight("MEDIUM") == 0.35
+        assert get_dga_severity_weight("HIGH") == 0.70
+        assert get_dga_severity_weight("CRITICAL") == 1.0
+
+    def test_unknown_severity_returns_zero(self):
+        from src.app.core.dga_classifier import get_dga_severity_weight
+
+        assert get_dga_severity_weight("UNKNOWN") == 0.0
+        assert get_dga_severity_weight("") == 0.0
+
+
+

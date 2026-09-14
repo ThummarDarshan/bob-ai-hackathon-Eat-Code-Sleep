@@ -502,3 +502,23 @@ def calculate_duval_triangle_coordinates(
         "duval_zone": zone,
     }
 
+
+def get_dga_severity_weight(severity: str) -> float:
+    """
+    Map DGA severity string to a normalized risk engine weighting factor (0.0 to 1.0).
+
+    Args:
+        severity: One of 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'
+
+    Returns:
+        float: Normalized severity factor (0.0 for LOW to 1.0 for CRITICAL)
+    """
+    weights = {
+        "LOW": 0.0,
+        "MEDIUM": 0.35,
+        "HIGH": 0.70,
+        "CRITICAL": 1.0,
+    }
+    return weights.get(str(severity).upper(), 0.0)
+
+
