@@ -36,18 +36,19 @@ export default function Assets() {
         </div>
       </div>
       <div className="page-content">
+        <hr className="section-divider" style={{ marginTop: 0, marginBottom: '24px' }} />
+
         {loading && <div className="loading-state"><div className="spinner" /> Loading assets...</div>}
         {error && <div className="error-state">⚠ {error}</div>}
         {!loading && !error && (
           <div className="glass-card">
             <div className="section-header">
-              <span className="section-title">{assets.length} Assets</span>
+              <span className="section-title">{assets.length} Assets Monitored</span>
             </div>
             <table className="data-table">
               <thead>
                 <tr>
-                  <th>Asset ID</th>
-                  <th>Name</th>
+                  <th>Asset</th>
                   <th>Type</th>
                   <th>Status</th>
                   <th>Capacity</th>
@@ -58,12 +59,14 @@ export default function Assets() {
               </thead>
               <tbody>
                 {assets.length === 0 ? (
-                  <tr><td colSpan={8}><div className="empty-state">No assets found</div></td></tr>
+                  <tr><td colSpan={7}><div className="empty-state">No assets found</div></td></tr>
                 ) : (
                   assets.map(a => (
-                    <tr key={a.asset_id} style={{ cursor: 'pointer' }} onClick={() => navigate(`/assets/${a.asset_id}`)}>
-                      <td><span style={{ fontFamily: 'monospace', color: 'var(--blue-glow)' }}>{a.asset_id}</span></td>
-                      <td>{a.name}</td>
+                    <tr key={a.asset_id} className={`risk-row-${(a.risk_level ?? 'LOW').toLowerCase()}`} onClick={() => navigate(`/assets/${a.asset_id}`)}>
+                      <td>
+                        <span style={{ color: 'var(--blue-glow)' }}>{a.asset_id}</span><br />
+                        <span className="text-muted text-sm">{a.name}</span>
+                      </td>
                       <td className="text-muted">{a.asset_type}</td>
                       <td>
                         <span style={{ color: a.status === 'active' ? 'var(--green)' : a.status === 'maintenance' ? 'var(--amber)' : 'var(--text-muted)' }}>
@@ -73,7 +76,7 @@ export default function Assets() {
                       <td className="text-muted">{a.capacity ? `${a.capacity} MVA` : '—'}</td>
                       <td>{a.critical_facility ? <span style={{ color: 'var(--risk-critical)' }}>⚠ {a.facility_type ?? 'yes'}</span> : <span className="text-muted">—</span>}</td>
                       <td><RiskBadge level={a.risk_level ?? 'LOW'} /></td>
-                      <td style={{ fontWeight: 600 }}>{a.final_risk_score !== undefined ? (a.final_risk_score * 100).toFixed(1) + '%' : '—'}</td>
+                      <td className="font-semibold">{a.final_risk_score !== undefined ? (a.final_risk_score * 100).toFixed(0) + '%' : '—'}</td>
                     </tr>
                   ))
                 )}
@@ -85,3 +88,4 @@ export default function Assets() {
     </div>
   );
 }
+

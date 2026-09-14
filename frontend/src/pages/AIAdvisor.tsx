@@ -6,27 +6,29 @@ export default function AIAdvisor() {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div className="top-bar">
         <h2>🤖 AI Advisor</h2>
-        <span style={{ marginLeft: '12px', fontSize: '12px', color: 'var(--text-muted)', background: 'rgba(59,130,246,0.1)', padding: '2px 8px', borderRadius: '4px', border: '1px solid rgba(59,130,246,0.2)' }}>
+        <span className="text-muted text-sm" style={{ background: 'rgba(59,130,246,0.1)', padding: '2px 8px', borderRadius: '4px', border: '1px solid rgba(59,130,246,0.2)' }}>
           IBM Granite · watsonx.ai
         </span>
-        <span style={{ marginLeft: 'auto', fontSize: '12px', color: 'var(--text-muted)' }}>
+        <span className="text-muted text-sm" style={{ marginLeft: 'auto' }}>
           Powered by real-time grid data
         </span>
       </div>
-      <div style={{ flex: 1, padding: '16px', display: 'flex', gap: '16px', overflow: 'hidden' }}>
+      <div className="page-content" style={{ flex: 1, display: 'flex', gap: '24px', overflow: 'hidden' }}>
         {/* Chat panel */}
         <div className="glass-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 0, overflow: 'hidden' }}>
-          <div style={{ padding: '14px 16px', borderBottom: '1px solid var(--glass-border)', fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-            💬 Grid AI Chat
+          <div className="section-header" style={{ padding: '16px 20px', borderBottom: '1px solid var(--glass-border)', marginBottom: 0 }}>
+            <span className="section-title">💬 AI Advisor Chat</span>
           </div>
           <AdvisorChat />
         </div>
 
         {/* Info panel */}
-        <div style={{ width: '280px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ width: '300px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div className="glass-card">
-            <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: '12px' }}>What can I ask?</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: 'var(--text-secondary)' }}>
+            <div className="section-header">
+              <span className="section-title">Prompt Suggestions</span>
+            </div>
+            <div className="flex flex-col gap-2 text-sm text-secondary">
               {[
                 '🔴 Which asset needs immediate inspection?',
                 '🌩 How does current weather affect risk?',
@@ -35,18 +37,20 @@ export default function AIAdvisor() {
                 '🔗 What happens if TX-001 fails?',
                 '📈 What is the cascade risk for this asset?',
               ].map((q, i) => (
-                <div key={i} style={{ padding: '8px', background: 'rgba(15,23,42,0.5)', borderRadius: '6px' }}>{q}</div>
+                <div key={i} className="weather-alert-item" style={{ padding: '8px', background: 'rgba(15,23,42,0.5)', border: '1px solid var(--glass-border)' }}>{q}</div>
               ))}
             </div>
           </div>
 
           <div className="glass-card">
-            <div style={{ fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>AI Model</div>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.8' }}>
+            <div className="section-header">
+              <span className="section-title">Model Specifications</span>
+            </div>
+            <div className="text-sm text-secondary" style={{ lineHeight: '1.8' }}>
               <div>Model: <span style={{ color: 'var(--blue-glow)' }}>IBM Granite 13B Instruct</span></div>
               <div>Platform: <span style={{ color: 'var(--blue-glow)' }}>watsonx.ai</span></div>
               <div>Fallback: <span style={{ color: 'var(--green)' }}>Local Rule Engine</span></div>
-              <div style={{ marginTop: '8px', fontSize: '11px', color: 'var(--text-muted)' }}>
+              <div className="text-muted text-sm mt-4">
                 Always uses live grid data as context. Never uses hardcoded responses.
               </div>
             </div>
@@ -56,3 +60,4 @@ export default function AIAdvisor() {
     </div>
   );
 }
+

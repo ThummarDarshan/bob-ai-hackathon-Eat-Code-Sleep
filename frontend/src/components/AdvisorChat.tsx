@@ -65,9 +65,9 @@ export default function AdvisorChat() {
   ];
 
   return (
-    <div className="flex-col" style={{ height: '100%', gap: 0 }}>
-      {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <div className="flex flex-col" style={{ flex: 1, height: '100%', overflow: 'hidden' }}>
+      {/* Messages area */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
         {messages.map((msg, i) => (
           <div key={i} style={{ display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start' }}>
             <div style={{
@@ -75,9 +75,9 @@ export default function AdvisorChat() {
               padding: '12px 16px',
               borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
               background: msg.role === 'user'
-                ? 'rgba(59,130,246,0.25)'
-                : 'rgba(15,30,60,0.8)',
-              border: '1px solid ' + (msg.role === 'user' ? 'rgba(59,130,246,0.3)' : 'var(--glass-border)'),
+                ? 'rgba(59,130,246,0.2)'
+                : 'var(--glass-bg)',
+              border: '1px solid ' + (msg.role === 'user' ? 'rgba(59,130,246,0.35)' : 'var(--glass-border)'),
               fontSize: '13px',
               lineHeight: '1.6',
             }}>
@@ -90,20 +90,22 @@ export default function AdvisorChat() {
             </div>
           </div>
         ))}
+
+        {/* Loading state using existing spinner & loading-state class */}
         {loading && (
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', color: 'var(--text-muted)' }}>
+          <div className="loading-state text-muted text-sm" style={{ height: 'auto', padding: '8px', justifyContent: 'flex-start', gap: '10px' }}>
             <div className="spinner" />
-            <span style={{ fontSize: '12px' }}>GridPulse AI is thinking...</span>
+            <span>GridPulse AI is thinking...</span>
           </div>
         )}
         <div ref={bottomRef} />
       </div>
 
-      {/* Suggestions */}
+      {/* Quick suggestions */}
       {messages.length <= 2 && (
-        <div style={{ padding: '8px 16px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+        <div style={{ padding: '8px 20px', display: 'flex', flexWrap: 'wrap', gap: '8px', borderTop: '1px solid rgba(99,179,237,0.08)' }}>
           {suggestions.map((s, i) => (
-            <button key={i} className="btn btn-ghost" style={{ fontSize: '11px', padding: '4px 10px' }}
+            <button key={i} className="btn btn-ghost text-sm" style={{ padding: '4px 12px' }}
               onClick={() => { setInput(s); }}>
               {s}
             </button>
@@ -111,8 +113,8 @@ export default function AdvisorChat() {
         </div>
       )}
 
-      {/* Input area */}
-      <div style={{ padding: '12px 16px', borderTop: '1px solid var(--glass-border)', display: 'flex', gap: '8px' }}>
+      {/* Pinned Input bar */}
+      <div style={{ padding: '16px 20px', borderTop: '1px solid var(--glass-border)', display: 'flex', gap: '12px', background: 'rgba(10,14,26,0.5)' }}>
         <input
           className="input"
           style={{ flex: 1 }}
@@ -123,9 +125,10 @@ export default function AdvisorChat() {
           disabled={loading}
         />
         <button className="btn btn-primary" onClick={send} disabled={loading || !input.trim()}>
-          Send
+          Send 🚀
         </button>
       </div>
     </div>
   );
 }
+
