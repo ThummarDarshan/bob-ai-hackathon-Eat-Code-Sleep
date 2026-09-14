@@ -518,3 +518,56 @@ valid=not errors and dga_result.valid,
     )
 
     return result.to_dict()
+
+
+def calculate_remaining_useful_life(
+    health_index: float,
+    degradation_rate: float = 0.1,
+    critical_threshold: float = 25.0
+) -> dict:
+    """
+    Estimate the Remaining Useful Life (RUL) and recommended inspection timeline
+    based on the current Health Index (HI) and degradation rate per 1,000 operational hours.
+
+    Args:
+        health_index: Current asset health index (0 to 100).
+        degradation_rate: Estimated HI degradation points lost per 1,000 operational hours.
+        critical_threshold: HI score below which equipment failure is imminent (default 25.0).
+
+    Returns:
+        dict containing:
+            - health_index: float
+            - critical_threshold: float
+            - estimated_operating_hours_remaining: float
+            - estimated_days_remaining: float
+            - urgent_inspection_required: bool
+            - recommended_inspection_days: int
+    """
+    clamped_hi = max(0.0, min(100.0, float(health_index)))
+    rate = max(0.01, float(degradation_rate))
+
+    points_to_threshold = max(0.0, clamped_hi - critical_threshold)
+    hours_remaining = round((points_to_threshold / rate) * 1000, 1)
+    days_remaining = round(hours_remaining / 24.0, 1)
+
+    urgent = clamped_hi <= critical_threshold
+    if clamped_hi >= 85.0:
+        recommended_inspection_days = 90
+    elif clamped_hi >= 65.0:
+        recommended_inspection_days = 45
+    elif clamped_hi >= 45.0:
+        recommended_inspection_days = 14
+    elif clamped_hi >= 25.0:
+        recommended_inspection_days = 5
+    else:
+        recommended_inspection_days = 1
+
+    return {
+        "health_index": clamped_hi,
+        "critical_threshold": critical_threshold,
+        "estimated_operating_hours_remaining": hours_remaining,
+        "estimated_days_remaining": days_remaining,
+        "urgent_inspection_required": urgent,
+        "recommended_inspection_days": recommended_inspection_days,
+    }
+

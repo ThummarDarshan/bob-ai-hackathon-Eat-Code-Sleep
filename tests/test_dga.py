@@ -504,3 +504,87 @@ class TestTelemetryIntegration:
         assert result["health_band"] in ("POOR", "CRITICAL"), (
             f"Arcing record should be POOR/CRITICAL, got {result['health_band']}"
         )
+
+
+class TestRemainingUsefulLife:
+    """Tests for calculate_remaining_useful_life in asset_health module."""
+
+    def test_healthy_asset_has_long_rul(self):
+        from src.app.core.asset_health import calculate_remaining_useful_life
+
+        rul = calculate_remaining_useful_life(health_index=90.0, degradation_rate=0.1)
+        assert rul["estimated_operating_hours_remaining"] > 500000
+        assert rul["estimated_days_remaining"] > 20000
+        assert not rul["urgent_inspection_required"]
+        assert rul["recommended_inspection_days"] == 90
+
+    def test_degraded_asset_requires_urgent_inspection(self):
+        from src.app.core.asset_health import calculate_remaining_useful_life
+
+        rul = calculate_remaining_useful_life(health_index=20.0, degradation_rate=0.1)
+        assert rul["estimated_operating_hours_remaining"] == 0.0
+        assert rul["urgent_inspection_required"] is True
+        assert rul["recommended_inspection_days"] == 1
+
+    def test_boundary_clamping_hi(self):
+        from src.app.core.asset_health import calculate_remaining_useful_life
+
+        rul_high = calculate_remaining_useful_life(health_index=150.0)
+        assert rul_high["health_index"] == 100.0
+
+        rul_low = calculate_remaining_useful_life(health_index=-10.0)
+        assert rul_low["health_index"] == 0.0
+
+
+class TestDuvalTriangle:
+    """Tests for calculate_duval_triangle_coordinates in dga_classifier module."""
+
+    def test_all_zeros_handled_gracefully(self):
+        from src.app.core.dga_classifier import calculate_duval_triangle_coordinates
+
+        res = calculate_duval_triangle_coordinates(0.0, 0.0, 0.0)
+        assert res["total_triangle_gas"] == 0.0
+        assert res["pct_ch4"] == 0.0
+        assert res["duval_zone"] == "NORMAL_OR_NO_GAS"
+
+    def test_thermal_fault_t3_classification(self):
+        from src.app.core.dga_classifier import calculate_duval_triangle_coordinates
+
+        res = calculate_duval_triangle_coordinates(ch4_ppm=20.0, c2h4_ppm=75.0, c2h2_ppm=5.0)
+        assert res["pct_c2h4"] == 75.0
+        assert res["duval_zone"] == "T3"
+
+    def test_arcing_d2_classification(self):
+        from src.app.core.dga_classifier import calculate_duval_triangle_coordinates
+
+        res = calculate_duval_triangle_coordinates(ch4_ppm=30.0, c2h4_ppm=30.0, c2h2_ppm=40.0)
+        assert res["pct_c2h2"] == 40.0
+        assert res["duval_zone"] == "D2"
+
+    def test_percentages_sum_to_100(self):
+        from src.app.core.dga_classifier import calculate_duval_triangle_coordinates
+
+        res = calculate_duval_triangle_coordinates(ch4_ppm=45.0, c2h4_ppm=35.0, c2h2_ppm=20.0)
+        total_pct = res["pct_ch4"] + res["pct_c2h4"] + res["pct_c2h2"]
+        assert abs(total_pct - 100.0) < 0.1
+
+
+class TestDGASeverityWeight:
+    """Tests for get_dga_severity_weight in dga_classifier module."""
+
+    def test_severity_weight_mappings(self):
+        from src.app.core.dga_classifier import get_dga_severity_weight
+
+        assert get_dga_severity_weight("LOW") == 0.0
+        assert get_dga_severity_weight("MEDIUM") == 0.35
+        assert get_dga_severity_weight("HIGH") == 0.70
+        assert get_dga_severity_weight("CRITICAL") == 1.0
+
+    def test_unknown_severity_returns_zero(self):
+        from src.app.core.dga_classifier import get_dga_severity_weight
+
+        assert get_dga_severity_weight("UNKNOWN") == 0.0
+        assert get_dga_severity_weight("") == 0.0
+
+
+
